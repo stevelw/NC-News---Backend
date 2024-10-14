@@ -1,7 +1,9 @@
 const request = require('supertest')
 const app = require("../app");
-const { topicData } = require('../db/data/test-data');
 const connection = require('../db/connection')
+
+const { topicData } = require('../db/data/test-data');
+const endpointsData = require('../endpoints.json')
 
 afterAll(() => connection.end())
 
@@ -11,6 +13,16 @@ describe(`Endpoint doesn't exist`, () => {
             .expect(404)
             .then(({ body : { msg }}) => {
                 expect(msg).toBe('Invalid endpoint. Check /api for a list of all available endpoints.')
+            })
+    })
+})
+
+describe('/api', () => {
+    it('GET - 200 - Returns api documentation JSON', () => {
+        return request(app).get('/api')
+            .expect(200)
+            .then(({ body: { endpoints } }) => {
+                expect(endpoints).toEqual(endpointsData)
             })
     })
 })

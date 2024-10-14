@@ -2,6 +2,9 @@ const express = require('express')
 const app = express()
 const { getTopics } = require('./controllers/topics.controller')
 const { handleCustomErrors, handleServerErros} = require('./server-error-handling')
+const { getEndpoints } = require('./controllers/api.controller')
+
+app.get('/api', getEndpoints)
 
 app.get('/api/topics', getTopics)
 
