@@ -1,12 +1,15 @@
 const express = require('express')
 const app = express()
 const { getTopics } = require('./controllers/topics.controller')
-const { handleCustomErrors, handleServerErros} = require('./server-error-handling')
+const { handleCustomErrors, handleServerErros, handlePsqlErrors} = require('./server-error-handling')
 const { getEndpoints } = require('./controllers/api.controller')
+const { getArticleWithId } = require('./controllers/articles.controller')
 
 app.get('/api', getEndpoints)
 
 app.get('/api/topics', getTopics)
+
+app.get('/api/articles/:article_id', getArticleWithId)
 
 app.all('*', (req, res, next) => {
     const err = new Error(`Invalid endpoint`)
@@ -16,6 +19,8 @@ app.all('*', (req, res, next) => {
 })
 
 app.use(handleCustomErrors)
+
+app.use(handlePsqlErrors)
 
 app.use(handleServerErros)
 
