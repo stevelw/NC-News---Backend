@@ -3,4 +3,4 @@ const app = express()
 
 // TODO: Add endpoints
 
-module.exports = { app }
+module.exports = app
