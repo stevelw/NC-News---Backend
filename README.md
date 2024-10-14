@@ -1,6 +1,10 @@
 # Northcoders News API
 
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
+To setup your environment to run this project you will first need to create two _.env_ files to define the databases to use for testing or development. An example file, _.env-example_, has been provided.
+
+1. Duplicate this file as _.env.test_ and also _.env.development_ in the root directory.
+2. Edit both files to provide the database names you wish to use.
+3. Run
 
 
 
