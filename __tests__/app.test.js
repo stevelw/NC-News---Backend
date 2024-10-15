@@ -2,7 +2,7 @@ const request = require('supertest')
 const app = require("../app");
 const connection = require('../db/connection')
 
-const { topicData } = require('../db/data/test-data');
+const { topicData, articleData } = require('../db/data/test-data');
 const endpointsData = require('../endpoints.json')
 
 afterAll(() => connection.end())
@@ -73,5 +73,61 @@ describe('/api/articles/:article_id', () => {
                     expect(result.body.msg).toBe('Invalid input')
                 })
             })
+    })
+})
+
+describe('api/articles', () => {
+    describe('GET - 200', () => {
+        it('Returns an array of articles', () => {
+            return request(app).get('/api/articles')
+                .expect(200)
+                .then(({ body: { articles }}) => {
+                    articles.forEach(article => {
+                        expect(article).toMatchObject({
+                            author: expect.any(String),
+                            title: expect.any(String),
+                            article_id: expect.any(Number),
+                            topic: expect.any(String),
+                            created_at: expect.any(String),
+                            votes: expect.any(Number),
+                            article_img_url: expect.any(String),
+                        })
+                    })
+                })
+        })
+        it('All articles are returned', () => {
+            return request(app).get('/api/articles')
+                .expect(200)
+                .then(({ body: { articles }}) => {
+                    expect(articles).toHaveLength(articleData.length)
+                })
+        })
+        it('Articles include a comment_count computed property', () => {
+            return request(app).get('/api/articles')
+                .expect(200)
+                .then(({ body: { articles }}) => {
+                    articles.forEach(article => {
+                        expect(article).toMatchObject({
+                            comment_count: expect.any(Number)
+                        })
+                    })
+                })
+        })
+        it('Articles are sorted by date in descending order', () => {
+            return request(app).get('/api/articles')
+                .expect(200)
+                .then(({ body: { articles }}) => {
+                    expect(articles).toBeSortedBy('created_at', { descending: true})
+                })
+        })
+        it('does not return a body property for the articles', () => {
+            return request(app).get('/api/articles')
+                .expect(200)
+                .then(({ body: { articles }}) => {
+                    articles.forEach(article => {
+                        expect(article).not.toHaveProperty('body')
+                    })
+                })
+        })
     })
 })

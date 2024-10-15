@@ -9,3 +9,12 @@ exports.getArticleWithId = async (req, res, next) => {
         next(err)
     }
 }
+
+exports.getArticles = async (req, res, next) => {
+    try {
+        const articles = await articlesModel.getArticles()
+        res.status(200).send({ articles })
+    } catch (err) {
+        next(err)
+    }
+}
