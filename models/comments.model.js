@@ -1,4 +1,5 @@
 const db = require('../db/connection')
+const format = require('pg-format')
 const { getArticleWithId } = require('./articles.model')
 
 exports.getCommentsForArticle = ( articleId ) => {
@@ -20,5 +21,20 @@ exports.getCommentsForArticle = ( articleId ) => {
         } else {
             return comments
         }
+    })
+}
+
+exports.addCommentToArticleForUser = (comment, article_id, username) => {
+    if (!username || !comment) return Promise.reject({ status: 400, msg: 'Missing inputs' })
+    const formattedQuery = format(`
+        INSERT INTO comments
+            (body, article_id, author)
+        VALUES
+            %L
+        RETURNING comment_id, votes, created_at, author, body, article_id
+        `, [[comment, article_id, username]])
+        return db.query(formattedQuery)
+        .then(({ rows }) => {
+        return rows[0]
     })
 }

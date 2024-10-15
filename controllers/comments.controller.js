@@ -10,3 +10,14 @@ exports.getCommentsForArticle = (req, res, next) => {
         next(err)
     })
 }
+
+exports.addNewComment = (req, res, next) => {
+    const articleId = req.params.article_id
+    const username = req.body.username
+    const comment = req.body.body
+    return commentsModel.addCommentToArticleForUser(comment, articleId, username)
+    .then( comment => {
+        res.status(201).send({ comment })
+    })
+    .catch(err => next(err))
+}
