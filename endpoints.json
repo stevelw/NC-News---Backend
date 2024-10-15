@@ -11,7 +11,7 @@
   "GET /api/articles/:article_id": {
     "description": "serves the article with :article_id",
     "exampleResponse": {
-      "Article": {
+      "article": {
         "author": "butter_bridge",
         "title": "Living in the shadow of a great man",
         "article_id": 1,
@@ -22,6 +22,43 @@
         "article_img_url":
 "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
     }
+    }
+  },
+  "GET /api/articles": {
+    "description": "serves an array of all articles, sorted by decending creation date",
+    "exampleResponse": {
+      "articles": [
+        {
+          "author": "icellusedkars",
+          "title": "Eight pug gifs that remind me of mitch",
+          "article_id": 3,
+          "topic": "mitch",
+          "created_at": "2020-11-03T09:12:00.000Z",
+          "votes": 0,
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          "comment_count": 2
+        },
+        {
+          "author": "icellusedkars",
+          "title": "A",
+          "article_id": 6,
+          "topic": "mitch",
+          "created_at": "2020-10-18T01:00:00.000Z",
+          "votes": 0,
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          "comment_count": 1
+        },
+        {
+          "author": "icellusedkars",
+          "title": "Sony Vaio; or, The Laptop",
+          "article_id": 2,
+          "topic": "mitch",
+          "created_at": "2020-10-16T05:03:00.000Z",
+          "votes": 0,
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          "comment_count": 1
+        }
+      ]
     }
   }
 }

@@ -12,3 +12,19 @@ exports.getArticleWithId = (articleId) => {
             return results.rows[0]
         })
 }
+
+exports.getArticles = () => {
+    return db.query(`
+        SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, article_img_url, COUNT(*) as comment_count
+        FROM articles
+        LEFT JOIN comments ON articles.article_id = comments.article_id
+        GROUP BY articles.article_id
+        ORDER BY articles.created_at DESC
+        `)
+        .then(({ rows: articles }) => {
+            articles.forEach( article => {
+                article.comment_count = Number(article.comment_count)
+            })
+            return articles
+        })
+}
