@@ -104,10 +104,13 @@ describe('api/articles', () => {
                 })
         })
         it('Articles include a comment_count computed property', () => {
+            const exampleArticleId = 2
+            const expectedCommentCount = 0
             return request(app).get('/api/articles')
                 .expect(200)
                 .then(({ body: { articles }}) => {
                     articles.forEach(article => {
+                        if ( article.article_id === exampleArticleId ) expect( article.comment_count ).toBe(expectedCommentCount)
                         expect(article).toMatchObject({
                             comment_count: expect.any(Number)
                         })
