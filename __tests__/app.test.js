@@ -109,6 +109,7 @@ describe('api/articles', () => {
             return request(app).get('/api/articles')
                 .expect(200)
                 .then(({ body: { articles }}) => {
+                    expect(articles).toHaveLength(articleData.length)
                     articles.forEach(article => {
                         if ( article.article_id === exampleArticleId ) expect( article.comment_count ).toBe(expectedCommentCount)
                         expect(article).toMatchObject({
@@ -128,6 +129,7 @@ describe('api/articles', () => {
             return request(app).get('/api/articles')
                 .expect(200)
                 .then(({ body: { articles }}) => {
+                    expect(articles).toHaveLength(articleData.length)
                     articles.forEach(article => {
                         expect(article).not.toHaveProperty('body')
                     })
