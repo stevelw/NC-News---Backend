@@ -192,4 +192,92 @@ describe('api/articles/:article_id/comments', () => {
                 })
             })
     })
+    describe('POST - 201', () => {
+        it('adds a comment to an article and returns the posted comment', () => {
+            const exampleComment = {
+                article_id: 1,
+                username: "butter_bridge",
+                body: "What a lovely article!"
+            }
+            return request(app).post('/api/articles/' + exampleComment.article_id + '/comments').send(exampleComment)
+            .expect(201)
+            .then(({ body: { comment } }) => {
+                expect(comment).toMatchObject({
+                    comment_id: expect.any(Number),
+                    votes: 0,
+                    created_at: expect.any(String),
+                    author: exampleComment.username,
+                    body: exampleComment.body,
+                    article_id: exampleComment.article_id
+                })
+            })
+        })
+    })
+    describe(`POST - 404`, () => {
+        it(`article doesn't exist`, () => {
+            const exampleComment = {
+                invalidArticle_id: 999999999,
+                username: "butter_bridge",
+                body: "What a lovely article!"
+            }
+            return request(app).post('/api/articles/' + exampleComment.invalidArticle_id + '/comments').send(exampleComment)
+            .expect(404)
+            .then(({ body: { msg }}) => {
+                expect(msg).toBe(`Article doesn't exist`)
+            })
+        })
+        it(`username doesn't exist`, () => {
+            const exampleComment = {
+                article_id: 1,
+                username: "not-a-user",
+                body: "What a lovely article!"
+            }
+            return request(app).post('/api/articles/' + exampleComment.article_id + '/comments').send(exampleComment)
+            .expect(404)
+            .then(({ body: { msg }}) => {
+                expect(msg).toBe('No such user')
+            })
+        })
+    })
+    describe(`POST - 400 - invalid inputs`, () => {
+        it('rejects invalid article_id', () => {
+            const exampleComment = {
+                username: "butter_bridge",
+                body: "What a lovely article!"
+            }
+            return Promise.all(
+                [
+                    request(app).post('/api/articles/' + 2147483648 + '/comments').send(exampleComment), // Max range for PSQL SERIAL is 1 to 2,147,483,647
+                    request(app).post('/api/articles/' + 'not-an-int' + '/comments').send(exampleComment)
+                ])
+                .then(results => {
+                    results.forEach(result => {
+                        expect(result.status).toBe(400)
+                        expect(result.body.msg).toBe('Invalid input')
+                    })
+                })
+        })
+        it('rejects missing username', () => {
+            const exampleArticleId = 4
+            const missingUsernameExampleComment = {
+                body: "What a lovely article!"
+            }
+            return request(app).post('/api/articles/' + exampleArticleId + '/comments').send(missingUsernameExampleComment)
+            .then(result => {
+                expect(result.status).toBe(400)
+                expect(result.body.msg).toBe('Missing inputs')
+            })
+        })
+        it('rejects missing body', () => {
+            const exampleArticleId = 4
+            const missingBodyExampleComment = {
+                username: "butter_bridge"
+            }
+            return request(app).post('/api/articles/' + exampleArticleId + '/comments').send(missingBodyExampleComment)
+            .then(result => {
+                expect(result.status).toBe(400)
+                expect(result.body.msg).toBe('Missing inputs')
+            })
+        })
+    })
 })

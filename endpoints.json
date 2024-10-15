@@ -91,5 +91,22 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "creates a new comment for an article, by a user, and returns it",
+    "exampleRequestBody": {
+      "username": "butter_bridge",
+      "body": "What a lovely article!"
+    },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 19,
+        "votes": 0,
+        "created_at": "2024-10-15T17:53:45.376Z",
+        "author": "butter_bridge",
+        "body": "What a lovely article!",
+        "article_id": 1
+      }
+    }
   }
 }
