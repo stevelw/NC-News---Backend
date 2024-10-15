@@ -11,7 +11,7 @@
   "GET /api/articles/:article_id": {
     "description": "serves the article with :article_id",
     "exampleResponse": {
-      "Article": {
+      "article": {
         "author": "butter_bridge",
         "title": "Living in the shadow of a great man",
         "article_id": 1,
