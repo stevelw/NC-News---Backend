@@ -82,6 +82,7 @@ describe('api/articles', () => {
             return request(app).get('/api/articles')
                 .expect(200)
                 .then(({ body: { articles }}) => {
+                    expect(articles).toHaveLength(articleData.length)
                     articles.forEach(article => {
                         expect(article).toMatchObject({
                             author: expect.any(String),
