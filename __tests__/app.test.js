@@ -1,9 +1,12 @@
 const request = require('supertest')
 const app = require("../app");
 const connection = require('../db/connection')
+const seed = require('../db/seeds/seed');
 
-const { topicData, articleData, commentData } = require('../db/data/test-data');
-const endpointsData = require('../endpoints.json')
+const testData = require('../db/data/test-data');
+const endpointsData = require('../endpoints.json');
+
+beforeEach(() => seed(testData))
 
 afterAll(() => connection.end())
 
@@ -32,7 +35,7 @@ describe('/api/topics', () => {
         return request(app).get('/api/topics')
             .expect(200)
             .then(({ body: { topics } }) => {
-                expect(topics).toEqual(topicData)
+                expect(topics).toEqual(testData.topicData)
             })
     })
 })
@@ -82,7 +85,7 @@ describe('api/articles', () => {
             return request(app).get('/api/articles')
                 .expect(200)
                 .then(({ body: { articles }}) => {
-                    expect(articles).toHaveLength(articleData.length)
+                    expect(articles).toHaveLength(testData.articleData.length)
                     articles.forEach(article => {
                         expect(article).toMatchObject({
                             author: expect.any(String),
@@ -100,7 +103,7 @@ describe('api/articles', () => {
             return request(app).get('/api/articles')
                 .expect(200)
                 .then(({ body: { articles }}) => {
-                    expect(articles).toHaveLength(articleData.length)
+                    expect(articles).toHaveLength(testData.articleData.length)
                 })
         })
         it('Articles include a comment_count computed property', () => {
@@ -109,7 +112,7 @@ describe('api/articles', () => {
             return request(app).get('/api/articles')
                 .expect(200)
                 .then(({ body: { articles }}) => {
-                    expect(articles).toHaveLength(articleData.length)
+                    expect(articles).toHaveLength(testData.articleData.length)
                     articles.forEach(article => {
                         if ( article.article_id === exampleArticleId ) expect( article.comment_count ).toBe(expectedCommentCount)
                         expect(article).toMatchObject({
@@ -129,7 +132,7 @@ describe('api/articles', () => {
             return request(app).get('/api/articles')
                 .expect(200)
                 .then(({ body: { articles }}) => {
-                    expect(articles).toHaveLength(articleData.length)
+                    expect(articles).toHaveLength(testData.articleData.length)
                     articles.forEach(article => {
                         expect(article).not.toHaveProperty('body')
                     })
