@@ -2,7 +2,7 @@ const request = require('supertest')
 const app = require("../app");
 const connection = require('../db/connection')
 
-const { topicData, articleData } = require('../db/data/test-data');
+const { topicData, articleData, commentData } = require('../db/data/test-data');
 const endpointsData = require('../endpoints.json')
 
 afterAll(() => connection.end())
@@ -133,5 +133,58 @@ describe('api/articles', () => {
                     })
                 })
         })
+    })
+})
+
+describe('api/articles/:article_id/comments', () => {
+    describe('GET - 200', () => {
+        it('returns all comments for an article, with expected properties', () => {
+            const exampleArticleId = 1
+            const expectedNumberOfComments = 11
+            return request(app).get('/api/articles/' + exampleArticleId + '/comments')
+                .expect(200)
+                .then(({ body: { comments }}) => {
+                    expect(comments).toHaveLength(expectedNumberOfComments)
+                    comments.forEach( comment => {
+                        expect(comment).toMatchObject({
+                            comment_id: expect.any(Number),
+                            votes: expect.any(Number),
+                            created_at: expect.any(String),
+                            author: expect.any(String),
+                            body: expect.any(String),
+                            article_id: exampleArticleId
+                        })
+                    })
+                })
+        })
+        it('sorts comments by descending created_at', () => {
+            const exampleArticleId = 1
+            const expectedNumberOfComments = 11
+            return request(app).get('/api/articles/'+ exampleArticleId + '/comments')
+                .expect(200)
+                .then(({ body: { comments }}) => {
+                    expect(comments).toBeSortedBy("created_at")
+                })
+        })
+    })
+    it(`GET - 404 - article doesn't exist`, () => {
+        return request(app).get('/api/articles/' + 999999999 + '/comments')
+        .expect(404)
+        .then(({ body: { msg }}) => {
+            expect(msg).toBe('Article not found')
+        })
+    })
+    it('GET - 400 - ID not a +ve integer in range', () => {
+        return Promise.all(
+            [
+                request(app).get('/api/articles/' + 2147483648 + '/comments'), // Max range for PSQL SERIAL is 1 to 2,147,483,647
+                request(app).get('/api/articles/' + 'not-an-int' + '/comments')
+            ])
+            .then(results => {
+                results.forEach(result => {
+                    expect(result.status).toBe(400)
+                    expect(result.body.msg).toBe('Invalid input')
+                })
+            })
     })
 })
