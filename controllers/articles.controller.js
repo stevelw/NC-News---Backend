@@ -1,20 +1,24 @@
 const articlesModel = require("../models/articles.model")
 
-exports.getArticleWithId = async (req, res, next) => {
+exports.getArticleWithId = (req, res, next) => {
     const articleId = req.params.article_id
-    try {
-        const article = await articlesModel.getArticleWithId(articleId)
+    return articlesModel.getArticleWithId(articleId)
+    .then( article => {
         res.status(200).send({ article })
-    } catch (err) {
+
+    })
+    .catch( err => {
         next(err)
-    }
+    })
 }
 
-exports.getArticles = async (req, res, next) => {
-    try {
-        const articles = await articlesModel.getArticles()
+exports.getArticles = (req, res, next) => {
+    return articlesModel.getArticles()
+    .then( articles => {
         res.status(200).send({ articles })
-    } catch (err) {
+    })
+    .catch( err => {
         next(err)
-    }
+    })
+}
 }
