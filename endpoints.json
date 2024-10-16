@@ -16,6 +16,13 @@
           "usage": "The name of the column to sort by",
           "defaultValue": "created_at"
         }
+      },
+      {
+        "order": {
+          "usage": "The sorting order",
+          "allowedValues": ["DESC", "ASC"],
+          "defaultValue": "DESC"
+        }
       }
     ],
     "exampleResponse": {

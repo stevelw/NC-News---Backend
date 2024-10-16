@@ -14,10 +14,12 @@ exports.getArticleWithId = (articleId) => {
         })
 }
 
-exports.getArticles = ( sortBy = 'created_at') => {
+exports.getArticles = ( sortBy = 'created_at', order = 'desc') => {
     const allowedSortBys = ['author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'article_img_url', 'comment_count']
+    const allowedOrders = ['ASC', 'DESC']
     sortBy = sortBy.toLowerCase()
-    if (!allowedSortBys.includes(sortBy)) {
+    order = order.toUpperCase()
+    if (!allowedSortBys.includes(sortBy) || !allowedOrders.includes(order)) {
         return Promise.reject({ status: 400, msg: 'Invalid input'})
     }
 
@@ -26,8 +28,8 @@ exports.getArticles = ( sortBy = 'created_at') => {
         FROM articles
         LEFT JOIN comments ON articles.article_id = comments.article_id
         GROUP BY articles.article_id
-        ORDER BY %I DESC
-        `, sortBy)
+        ORDER BY %I %s
+        `, sortBy, order)
     return db.query(formattedQuery)
         .then(({ rows: articles }) => {
             return articles
