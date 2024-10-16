@@ -13,7 +13,9 @@ exports.getArticleWithId = (req, res, next) => {
 }
 
 exports.getArticles = (req, res, next) => {
-    return articlesModel.getArticles()
+    const sortBy = req.query.sort_by
+
+    return articlesModel.getArticles(sortBy)
     .then( articles => {
         res.status(200).send({ articles })
     })

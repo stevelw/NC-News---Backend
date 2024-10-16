@@ -9,7 +9,15 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles, sorted by decending creation date",
+    "description": "serves an array of all articles",
+    "queries": [
+      {
+        "sort_by": {
+          "usage": "The name of the column to sort by",
+          "defaultValue": "created_at"
+        }
+      }
+    ],
     "exampleResponse": {
       "articles": [
         {
