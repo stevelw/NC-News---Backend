@@ -40,6 +40,68 @@ describe('/api/topics', () => {
     })
 })
 
+describe('/api/articles', () => {
+    describe('GET - 200', () => {
+        it('Returns an array of articles', () => {
+            return request(app).get('/api/articles')
+                .expect(200)
+                .then(({ body: { articles }}) => {
+                    expect(articles).toHaveLength(testData.articleData.length)
+                    articles.forEach(article => {
+                        expect(article).toMatchObject({
+                            author: expect.any(String),
+                            title: expect.any(String),
+                            article_id: expect.any(Number),
+                            topic: expect.any(String),
+                            created_at: expect.any(String),
+                            votes: expect.any(Number),
+                            article_img_url: expect.any(String),
+                        })
+                    })
+                })
+        })
+        it('All articles are returned', () => {
+            return request(app).get('/api/articles')
+                .expect(200)
+                .then(({ body: { articles }}) => {
+                    expect(articles).toHaveLength(testData.articleData.length)
+                })
+        })
+        it('Articles include a comment_count computed property', () => {
+            const exampleArticleId = 2
+            const expectedCommentCount = 0
+            return request(app).get('/api/articles')
+                .expect(200)
+                .then(({ body: { articles }}) => {
+                    expect(articles).toHaveLength(testData.articleData.length)
+                    articles.forEach(article => {
+                        if ( article.article_id === exampleArticleId ) expect( article.comment_count ).toBe(expectedCommentCount)
+                        expect(article).toMatchObject({
+                            comment_count: expect.any(Number)
+                        })
+                    })
+                })
+        })
+        it('Articles are sorted by date in descending order', () => {
+            return request(app).get('/api/articles')
+                .expect(200)
+                .then(({ body: { articles }}) => {
+                    expect(articles).toBeSortedBy('created_at', { descending: true})
+                })
+        })
+        it('does not return a body property for the articles', () => {
+            return request(app).get('/api/articles')
+                .expect(200)
+                .then(({ body: { articles }}) => {
+                    expect(articles).toHaveLength(testData.articleData.length)
+                    articles.forEach(article => {
+                        expect(article).not.toHaveProperty('body')
+                    })
+                })
+        })
+    })
+})
+
 describe('/api/articles/:article_id', () => {
     it('GET - 200 - Returns the article with ID provided', () => {
         return request(app).get('/api/articles/' + 1)
@@ -170,68 +232,6 @@ describe('/api/articles/:article_id', () => {
                 expect(result.status).toBe(400)
                 expect(result.body.msg).toBe('Invalid input')
             })
-        })
-    })
-})
-
-describe('/api/articles', () => {
-    describe('GET - 200', () => {
-        it('Returns an array of articles', () => {
-            return request(app).get('/api/articles')
-                .expect(200)
-                .then(({ body: { articles }}) => {
-                    expect(articles).toHaveLength(testData.articleData.length)
-                    articles.forEach(article => {
-                        expect(article).toMatchObject({
-                            author: expect.any(String),
-                            title: expect.any(String),
-                            article_id: expect.any(Number),
-                            topic: expect.any(String),
-                            created_at: expect.any(String),
-                            votes: expect.any(Number),
-                            article_img_url: expect.any(String),
-                        })
-                    })
-                })
-        })
-        it('All articles are returned', () => {
-            return request(app).get('/api/articles')
-                .expect(200)
-                .then(({ body: { articles }}) => {
-                    expect(articles).toHaveLength(testData.articleData.length)
-                })
-        })
-        it('Articles include a comment_count computed property', () => {
-            const exampleArticleId = 2
-            const expectedCommentCount = 0
-            return request(app).get('/api/articles')
-                .expect(200)
-                .then(({ body: { articles }}) => {
-                    expect(articles).toHaveLength(testData.articleData.length)
-                    articles.forEach(article => {
-                        if ( article.article_id === exampleArticleId ) expect( article.comment_count ).toBe(expectedCommentCount)
-                        expect(article).toMatchObject({
-                            comment_count: expect.any(Number)
-                        })
-                    })
-                })
-        })
-        it('Articles are sorted by date in descending order', () => {
-            return request(app).get('/api/articles')
-                .expect(200)
-                .then(({ body: { articles }}) => {
-                    expect(articles).toBeSortedBy('created_at', { descending: true})
-                })
-        })
-        it('does not return a body property for the articles', () => {
-            return request(app).get('/api/articles')
-                .expect(200)
-                .then(({ body: { articles }}) => {
-                    expect(articles).toHaveLength(testData.articleData.length)
-                    articles.forEach(article => {
-                        expect(article).not.toHaveProperty('body')
-                    })
-                })
         })
     })
 })
