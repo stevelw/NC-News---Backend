@@ -77,9 +77,7 @@ describe('/api/articles/:article_id', () => {
                 })
             })
     })
-})
-
-describe('api/articles', () => {
+describe('/api/articles', () => {
     describe('GET - 200', () => {
         it('Returns an array of articles', () => {
             return request(app).get('/api/articles')
@@ -141,7 +139,7 @@ describe('api/articles', () => {
     })
 })
 
-describe('api/articles/:article_id/comments', () => {
+describe('/api/articles/:article_id/comments', () => {
     describe('GET - 200', () => {
         it('returns all comments for an article, with expected properties', () => {
             const exampleArticleId = 1
