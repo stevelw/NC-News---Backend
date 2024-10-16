@@ -12,12 +12,11 @@ app.get('/api', getEndpoints)
 
 app.get('/api/topics', getTopics)
 
-app.get('/api/articles/:article_id', getArticleWithId)
-
 app.get('/api/articles', getArticles)
 
-app.get('/api/articles/:article_id/comments', getCommentsForArticle)
+app.get('/api/articles/:article_id', getArticleWithId)
 
+app.get('/api/articles/:article_id/comments', getCommentsForArticle)
 app.post('/api/articles/:article_id/comments', addNewComment)
 
 app.all('*', (req, res, next) => {
