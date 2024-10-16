@@ -77,9 +77,104 @@ describe('/api/articles/:article_id', () => {
                 })
             })
     })
+    describe('PATCH - 200 - increases or decrease the vote property by .inc_votes and return the updated article', () => {
+        it('increases', () => {
+            const exampleArticleId = 4
+            const increaseBy = 5
+            var initialVotesValue
+            return request(app).get('/api/articles/' + exampleArticleId)
+            .then(({ body : { article : { votes }}}) => {
+                initialVotesValue = votes
+                const exampleBody = {
+                    inc_votes: increaseBy
+                }
+                return request(app).patch('/api/articles/' + exampleArticleId).send(exampleBody)
+                .expect(200)
+            })
+            .then(({ body : { updatedArticle } }) => {
+                expect(updatedArticle).toMatchObject({
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: exampleArticleId,
+                    body: expect.any(String),
+                    topic: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: initialVotesValue + increaseBy,
+                    article_img_url: expect.any(String)
+                })
+            })
+        })
+        it('decreases', () => {
+            const exampleArticleId = 4
+            const decreaseBy = 5
+            var initialVotesValue
+            return request(app).get('/api/articles/' + exampleArticleId)
+            .then(({ body : { article : { votes }}}) => {
+                initialVotesValue = votes
+                const exampleBody = {
+                    inc_votes: 0 - decreaseBy
+                }
+                return request(app).patch('/api/articles/' + exampleArticleId).send(exampleBody)
+                .expect(200)
+            })
+            .then(({ body : { updatedArticle } }) => {
+                expect(updatedArticle).toMatchObject({
+                    article_id: exampleArticleId,
+                    votes: initialVotesValue - decreaseBy
+                })
+            })
+        })
+    })
+    it('PATCH - 404 - article not found', () => {
+        const exampleBody = {
+            inc_votes: 5
+        }
+        return request(app).patch('/api/articles/' + 999999999).send(exampleBody)
+            .expect(404)
+            .then(({ body: { msg }}) => {
+                expect(msg).toBe('Article not found')
+            })
+    })
+    describe('PATCH 400', () => {
+        it('Article ID is invalid', () => {
+            const exampleBody = {
+                inc_votes: 5
+            }
+            return Promise.all(
+                [
+                    request(app).patch('/api/articles/' + 2147483648).send(exampleBody), // Max range for PSQL SERIAL is 1 to 2,147,483,647
+                    request(app).patch('/api/articles/' + 'not-an-int').send(exampleBody)
+                ])
+                .then(results => {
+                    results.forEach(result => {
+                        expect(result.status).toBe(400)
+                        expect(result.body.msg).toBe('Invalid input')
+                    })
+                })
+        })
+        it('Body is missing', () => {
+            const exampleArticleId = 4
+            return request(app).patch('/api/articles/' + exampleArticleId)
+            .then(result => {
+                expect(result.status).toBe(400)
+                expect(result.body.msg).toBe('Invalid request')
+            })
+        })
+        it('.inc_votes is invalid', () => {
+            const exampleArticleId = 4
+            const invalidInc_votesExampleBody = {
+                inc_votes: "Vote for me!"
+            }
+            return request(app).patch('/api/articles/' + exampleArticleId).send(invalidInc_votesExampleBody)
+            .then(result => {
+                expect(result.status).toBe(400)
+                expect(result.body.msg).toBe('Invalid input')
+            })
+        })
+    })
 })
 
-describe('api/articles', () => {
+describe('/api/articles', () => {
     describe('GET - 200', () => {
         it('Returns an array of articles', () => {
             return request(app).get('/api/articles')
@@ -141,7 +236,7 @@ describe('api/articles', () => {
     })
 })
 
-describe('api/articles/:article_id/comments', () => {
+describe('/api/articles/:article_id/comments', () => {
     describe('GET - 200', () => {
         it('returns all comments for an article, with expected properties', () => {
             const exampleArticleId = 1

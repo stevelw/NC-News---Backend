@@ -21,6 +21,9 @@ exports.handlePsqlErrors = (err, req, res, next) => {
                 res.status(404).send({ msg: `foreign_key_violation` })
             }
             break;
+        case '23502': // not_null_violation
+            res.status(400).send({ msg : 'Invalid request' })
+            break;
         default:
             next(err)
             break;
