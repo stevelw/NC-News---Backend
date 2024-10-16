@@ -82,12 +82,31 @@ describe('/api/articles', () => {
                     })
                 })
         })
-        it('Articles are sorted by date in descending order', () => {
-            return request(app).get('/api/articles')
-                .expect(200)
-                .then(({ body: { articles }}) => {
-                    expect(articles).toBeSortedBy('created_at', { descending: true})
+        describe('articles sorted by', () => {
+            it('date in descending order by default', () => {
+                return request(app).get('/api/articles')
+                    .expect(200)
+                    .then(({ body: { articles }}) => {
+                        expect(articles).toBeSortedBy('created_at', { descending: true})
+                    })
+            })
+            it('provided sort_by query', () => {
+                return request(app).get('/api/articles').query({ sort_by: 'votes' })
+                    .expect(200)
+                    .then(({ body: { articles }}) => {
+                        expect(articles).toBeSortedBy('votes', { descending: true})
+                    })
+            })
+            it('provided order query', () => {
+                return Promise.all([
+                    request(app).get('/api/articles').query({ order: 'desc' }).expect(200),
+                    request(app).get('/api/articles').query({ order: 'asc' }).expect(200)
+                ])
+                .then( results => {
+                    expect(results[0].body.articles).toBeSortedBy('created_at', { descending: true})
+                    expect(results[1].body.articles).toBeSortedBy('created_at', { descending: false})
                 })
+            })
         })
         it('does not return a body property for the articles', () => {
             return request(app).get('/api/articles')
@@ -98,6 +117,32 @@ describe('/api/articles', () => {
                         expect(article).not.toHaveProperty('body')
                     })
                 })
+        })
+    })
+    describe('GET - 400', () => {
+        it('Rejects invalid sort_by queries', () => {
+            return Promise.all(
+                [
+                    request(app).get('/api/articles').query({ sort_by: 'not-a-valid-column' }).expect(400),
+                    request(app).get('/api/articles').query({ sort_by: 5 }).expect(400)
+                ])
+            .then(results => {
+                results.forEach(result => {
+                    expect(result.body.msg).toBe('Invalid input')
+                })
+            })
+        })
+        it('Rejects invalid order queries', () => {
+            return Promise.all(
+                [
+                    request(app).get('/api/articles').query({ order: 'not-a-valid-order' }).expect(400),
+                    request(app).get('/api/articles').query({ order: 5 }).expect(400)
+                ])
+            .then(results => {
+                results.forEach(result => {
+                    expect(result.body.msg).toBe('Invalid input')
+                })
+            })
         })
     })
 })
