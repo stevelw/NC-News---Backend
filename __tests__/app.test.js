@@ -376,3 +376,45 @@ describe('/api/articles/:article_id/comments', () => {
         })
     })
 })
+
+describe('/api/comments/:comment_id', () => {
+    it('DELETE - 204 - deletes a comment by comment_id', () => {
+        var startingNumberOfComments
+
+        const exampleCommentId = 1
+        const articleIdForComment = 9
+        
+        return request(app).get('/api/articles/' + articleIdForComment + '/comments')
+        .then(({ body : { comments }}) => {
+            startingNumberOfComments = comments.length
+            return request(app).delete('/api/comments/' + exampleCommentId)
+            .expect(204)
+        })
+        .then(() => {
+            return request(app).get('/api/articles/' + articleIdForComment + '/comments')
+        })
+        .then(({ body : { comments }}) => {
+            expect(comments).toHaveLength(startingNumberOfComments - 1)
+        })
+    })
+    it('DELETE - 404 - ID not found', () => {
+        return request(app).delete('/api/comments/' + 999999999)
+            .expect(404)
+            .then(({ body: { msg }}) => {
+                expect(msg).toBe('No such comment')
+            })
+    })
+    it('DELETE - 400 - ID not valid', () => {
+        return Promise.all(
+            [
+                request(app).delete('/api/comments/' + 2147483648), // Max range for PSQL SERIAL is 1 to 2,147,483,647
+                request(app).delete('/api/comments/' + 'not-an-int')
+            ])
+            .then(results => {
+                results.forEach(result => {
+                    expect(result.status).toBe(400)
+                    expect(result.body.msg).toBe('Invalid input')
+                })
+            })
+    })
+})
