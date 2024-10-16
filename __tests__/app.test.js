@@ -418,3 +418,20 @@ describe('/api/comments/:comment_id', () => {
             })
     })
 })
+
+describe('/api/users', () => {
+    it('GET - 200 - serves a list of all users', () => {
+        return request(app).get('/api/users')
+        .expect(200)
+        .then(({ body : { users }}) => {
+            expect(users).toHaveLength(testData.userData.length)
+            users.forEach( user => {
+                expect(user).toMatchObject({
+                    username: expect.any(String),
+                    name: expect.any(String),
+                    avatar_url: expect.any(String)
+                })
+            })
+        })
+    })
+})
