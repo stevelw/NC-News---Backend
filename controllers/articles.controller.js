@@ -21,4 +21,17 @@ exports.getArticles = (req, res, next) => {
         next(err)
     })
 }
+
+exports.patchArticle = ( req, res, next ) => {
+    const articleId = req.params.article_id
+    
+    const voteAdjustment = req.body.inc_votes
+
+    return articlesModel.adjustVotesForArticleBy( articleId, voteAdjustment)
+    .then( updatedArticle => {
+        res.status(200).send({ updatedArticle })
+    })
+    .catch( err => {
+        next(err)
+    })
 }

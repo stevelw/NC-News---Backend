@@ -25,3 +25,16 @@ exports.getArticles = () => {
             return articles
         })
 }
+
+exports.adjustVotesForArticleBy = ( articleId, adjustment ) => {
+    return db.query(`
+        UPDATE articles
+        SET votes = votes + $2
+        WHERE article_id = $1
+        RETURNING author, title, article_id, body, topic, created_at, votes, article_img_url
+        `, [ articleId, adjustment ])
+        .then((results) => {
+            if (!results.rowCount) return Promise.reject({ status: 404, msg: 'Article not found'})
+            return results.rows[0]
+        })
+}
