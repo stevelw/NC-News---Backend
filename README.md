@@ -25,8 +25,8 @@ Requires [PostgreSQL](https://www.postgresql.org/download/) _v14.12+_ and [Node.
 
     Create three _.env_ files in the root directory (only `.env.test` is needed to run the tests):
     
-    1. `.env.test` with `PGDATABASE=nc_news_test`
-    2. `.env.development` with `PGDATABASE=nc_news`
+    1. `.env.test` with `PGDATABASE=[YOUR-TEST-DATABASE-NAME]`
+    2. `.env.development` with `PGDATABASE=[YOUR-DEVELOPMENT-DATABASE-NAME]`
     3. `.env.production` with `DATABASE_URL=[YOUR-SERVER-URL]`
 
 3. Install the development dependencies
