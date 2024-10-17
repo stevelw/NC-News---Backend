@@ -165,21 +165,32 @@ describe('/api/articles', () => {
 })
 
 describe('/api/articles/:article_id', () => {
-    it('GET - 200 - Returns the article with ID provided', () => {
-        return request(app).get('/api/articles/' + 1)
-            .expect(200)
-            .then(({ body: { article } }) => {
-                expect(article).toMatchObject({
-                    author: expect.any(String),
-                    title: expect.any(String),
-                    article_id: expect.any(Number),
-                    body: expect.any(String),
-                    topic: expect.any(String),
-                    created_at: expect.any(String),
-                    votes: expect.any(Number),
-                    article_img_url: expect.any(String)
+    describe('GET - 200', () => {
+        it('Returns the article with ID provided', () => {
+            return request(app).get('/api/articles/' + 1)
+                .expect(200)
+                .then(({ body: { article } }) => {
+                    expect(article).toMatchObject({
+                        author: expect.any(String),
+                        title: expect.any(String),
+                        article_id: expect.any(Number),
+                        body: expect.any(String),
+                        topic: expect.any(String),
+                        created_at: expect.any(String),
+                        votes: expect.any(Number),
+                        article_img_url: expect.any(String)
+                    })
                 })
-            })
+        })
+        it('includes a comment count', () => {
+            return request(app).get('/api/articles/' + 9)
+                .expect(200)
+                .then(({ body: { article } }) => {
+                    expect(article).toMatchObject({
+                        comment_count: 2
+                    })
+                })
+        })
     })
     it('GET - 404 - ID not found', () => {
         return request(app).get('/api/articles/' + 999999999)
