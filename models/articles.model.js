@@ -8,11 +8,10 @@ exports.getArticleWithId = (articleId) => {
         LEFT JOIN comments ON articles.article_id = comments.article_id
         WHERE articles.article_id = $1
         GROUP BY articles.article_id
-        LIMIT 1
         `, [articleId])
-        .then((results) => {
-            if (!results.rowCount) return Promise.reject({ status: 404, msg: 'Article not found'})
-            return results.rows[0]
+        .then(({ rowCount, rows}) => {
+            if (!rowCount) return Promise.reject({ status: 404, msg: 'Article not found'})
+            return rows[0]
         })
 }
 
