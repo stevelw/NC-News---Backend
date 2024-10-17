@@ -1,26 +1,12 @@
 const express = require('express')
 const app = express()
-const { getTopics } = require('./controllers/topics.controller')
 const { handleCustomErrors, handleServerErros, handlePsqlErrors} = require('./server/server-error-handling')
 const getEndpoints = require('./controllers/api.controller')
+const apiRouter = require("./server/api-router");
 
 app.use(express.json())
 
-app.get('/api', getEndpoints)
-
-app.get('/api/topics', getTopics)
-
-app.get('/api/articles', getArticles)
-
-app.get('/api/articles/:article_id', getArticleWithId)
-app.patch('/api/articles/:article_id', patchArticle)
-
-app.get('/api/articles/:article_id/comments', getCommentsForArticle)
-app.post('/api/articles/:article_id/comments', addNewComment)
-
-app.delete('/api/comments/:comment_id', deleteComment)
-
-app.get('/api/users', getUsers)
+app.use("/api", apiRouter);
 
 app.all('*', (req, res, next) => {
     const err = new Error(`Invalid endpoint`)
