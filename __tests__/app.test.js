@@ -118,6 +118,23 @@ describe('/api/articles', () => {
                     })
                 })
         })
+        describe('topic query', () => {
+            it('uses a provided topic query to filter output', () => {
+                return request(app).get('/api/articles').query({ topic: 'cats' })
+                    .expect(200)
+                    .then(({ body: { articles }}) => {
+                        expect(articles).toHaveLength(1)
+                    })
+            })
+            it(`returns an empty list if the topic isn't found`, () => {
+                return request(app).get('/api/articles').query({ topic: 'not-a-valid-topic' })
+                .expect(200)
+                .then(({ body: { articles }}) => {
+                    expect(articles).toHaveLength(0)
+                })
+        })
+
+        })
     })
     describe('GET - 400', () => {
         it('Rejects invalid sort_by queries', () => {
