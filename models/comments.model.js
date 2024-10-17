@@ -25,7 +25,6 @@ exports.getCommentsForArticle = ( articleId ) => {
 }
 
 exports.addCommentToArticleForUser = (comment, article_id, username) => {
-    if (!username || !comment) return Promise.reject({ status: 400, msg: 'Missing inputs' })
     const formattedQuery = format(`
         INSERT INTO comments
             (body, article_id, author)
