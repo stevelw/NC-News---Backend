@@ -1,7 +1,7 @@
 const articlesModel = require("../models/articles.model")
 
 exports.getArticleWithId = (req, res, next) => {
-    const articleId = req.params.article_id
+    const { article_id: articleId } = req.params
     return articlesModel.getArticleWithId(articleId)
     .then( article => {
         res.status(200).send({ article })
@@ -13,8 +13,7 @@ exports.getArticleWithId = (req, res, next) => {
 }
 
 exports.getArticles = (req, res, next) => {
-    const sortBy = req.query.sort_by
-    const order = req.query.order
+    const { sort_by: sortBy, order } = req.query
 
     return articlesModel.getArticles(sortBy, order)
     .then( articles => {
@@ -26,9 +25,7 @@ exports.getArticles = (req, res, next) => {
 }
 
 exports.patchArticle = ( req, res, next ) => {
-    const articleId = req.params.article_id
-    
-    const voteAdjustment = req.body.inc_votes
+    const { params: { article_id: articleId }, body: { inc_votes: voteAdjustment } } = req
 
     return articlesModel.adjustVotesForArticleBy( articleId, voteAdjustment)
     .then( updatedArticle => {
