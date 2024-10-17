@@ -124,6 +124,9 @@ describe('/api/articles', () => {
                     .expect(200)
                     .then(({ body: { articles }}) => {
                         expect(articles).toHaveLength(1)
+                        articles.forEach( ({ topic }) => {
+                            expect(topic).toBe('cats')
+                        })
                     })
             })
             it('returns an empty list if the topic exists but no articles match', () => {
