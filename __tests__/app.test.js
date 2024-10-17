@@ -126,6 +126,13 @@ describe('/api/articles', () => {
                         expect(articles).toHaveLength(1)
                     })
             })
+            it('returns an empty list if the topic exists but no articles match', () => {
+                return request(app).get('/api/articles').query({ topic: 'paper' })
+                .expect(200)
+                .then(({ body: { articles }}) => {
+                    expect(articles).toHaveLength(0)
+                })
+            })
             it(`returns an empty list if the topic isn't found`, () => {
                 return request(app).get('/api/articles').query({ topic: 'not-a-valid-topic' })
                 .expect(200)
