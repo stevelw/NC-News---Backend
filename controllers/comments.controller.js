@@ -1,8 +1,7 @@
 const commentsModel = require("../models/comments.model")
 
 exports.getCommentsForArticle = (req, res, next) => {
-    const articleId = req.params.article_id
-    return commentsModel.getCommentsForArticle(articleId)
+    return commentsModel.getCommentsForArticle(req.params.article_id)
     .then(comments => {
         res.status(200).send({ comments })
     })
@@ -12,10 +11,9 @@ exports.getCommentsForArticle = (req, res, next) => {
 }
 
 exports.addNewComment = (req, res, next) => {
-    const articleId = req.params.article_id
-    const username = req.body.username
-    const comment = req.body.body
-    return commentsModel.addCommentToArticleForUser(comment, articleId, username)
+    const { params: { article_id }, body: { username, body: comment } } = req
+    
+    return commentsModel.addCommentToArticleForUser(comment, article_id, username)
     .then( comment => {
         res.status(201).send({ comment })
     })
@@ -23,9 +21,7 @@ exports.addNewComment = (req, res, next) => {
 }
 
 exports.deleteComment = (req, res, next) => {
-    const commentId = req.params.comment_id
-    
-    return commentsModel.deleteCommentWithId(commentId)
+    return commentsModel.deleteCommentWithId(req.params.comment_id)
     .then( () => {
         res.status(204).send()
     })

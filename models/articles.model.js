@@ -14,7 +14,7 @@ exports.getArticleWithId = (articleId) => {
         })
 }
 
-exports.getArticles = ( sortBy = 'created_at', order = 'desc') => {
+exports.getArticles = (topic, sortBy = 'created_at', order = 'desc') => {
     const allowedSortBys = ['author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'article_img_url', 'comment_count']
     const allowedOrders = ['ASC', 'DESC']
     sortBy = sortBy.toLowerCase()
@@ -23,14 +23,26 @@ exports.getArticles = ( sortBy = 'created_at', order = 'desc') => {
         return Promise.reject({ status: 400, msg: 'Invalid input'})
     }
 
-    const formattedQuery = format(`
-        SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, article_img_url, COUNT(comment_id)::INT as comment_count
-        FROM articles
-        LEFT JOIN comments ON articles.article_id = comments.article_id
+    const queryVals = []
+    let queryStr = `
+    SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, article_img_url, COUNT(comment_id)::INT as comment_count
+    FROM articles
+    LEFT JOIN comments ON articles.article_id = comments.article_id
+    `
+    
+    if ( topic ) {
+        queryVals.push(topic)
+        queryStr += `
+        WHERE topic = $${queryVals.length}
+        `
+    }
+    
+    queryStr += format(`
         GROUP BY articles.article_id
         ORDER BY %I %s
         `, sortBy, order)
-    return db.query(formattedQuery)
+
+    return db.query(queryStr, queryVals)
         .then(({ rows: articles }) => {
             return articles
         })

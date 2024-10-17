@@ -12,6 +12,11 @@
     "description": "serves an array of all articles",
     "queries": [
       {
+        "topic": {
+          "usage": "Optional: The topic to filter by"
+        }
+      },
+      {
         "sort_by": {
           "usage": "The name of the column to sort by",
           "defaultValue": "created_at"
