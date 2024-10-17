@@ -14,7 +14,4 @@ apiRouter.use('/users', usersRouter)
 
 apiRouter.get("/", getEndpoints)
 
-//
-
-
 module.exports = apiRouter
