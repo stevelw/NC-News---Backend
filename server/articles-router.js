@@ -5,10 +5,12 @@ const { getCommentsForArticle, addNewComment } = require('../controllers/comment
 
 articlesRouter.get('/', getArticles)
 
-articlesRouter.get('/:article_id', getArticleWithId)
-articlesRouter.patch('/:article_id', patchArticle)
+articlesRouter.route('/:article_id')
+    .get(getArticleWithId)
+    .patch(patchArticle)
 
-articlesRouter.get('/:article_id/comments', getCommentsForArticle)
-articlesRouter.post('/:article_id/comments', addNewComment)
+articlesRouter.route('/:article_id/comments')
+    .get(getCommentsForArticle)
+    .post(addNewComment)
 
 module.exports = articlesRouter
