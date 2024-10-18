@@ -172,6 +172,101 @@ describe('/api/articles', () => {
                 })
         })
     })
+    describe('POST - 201', () => {
+        it('adds an artricle and returns it', () => {
+            return request(app).post('/api/articles/').send({
+                author: 'lurker',
+                title: 'A great title',
+                body: `This is an article.
+
+It has multiple lines`,
+                topic: 'cats',
+                article_img_url: 'https://commons.wikimedia.org/wiki/File:VN_drip_coffee_on_table.jpg'
+            })
+                .expect(201)
+                .then(({ body: { article } }) => {
+                    expect(article).toMatchObject({
+                        author: 'lurker',
+                        title: 'A great title',
+                        body: `This is an article.
+
+It has multiple lines`,
+                        topic: 'cats',
+                        article_img_url: 'https://commons.wikimedia.org/wiki/File:VN_drip_coffee_on_table.jpg',
+                        article_id: expect.any(Number),
+                        votes: 0,
+                        created_at: expect.any(String),
+                        comment_count: 0
+                    })
+                })
+        })
+        it('uses a default image if not provided', () => {
+            return request(app).post('/api/articles/').send({
+                author: 'lurker',
+                title: 'A great title',
+                body: `This is an article.
+                
+                It has multiple lines`,
+                topic: 'cats'
+            })
+                .expect(201)
+                .then(({ body: { article: { article_img_url } } }) => {
+                    expect(article_img_url).toBe('https://commons.wikimedia.org/wiki/File:Blue_Tiles_-_Free_For_Commercial_Use_-_FFCU_(26777905945).jpg')
+                })
+        })
+    })
+    describe(`POST - 400 - invalid inputs`, () => {
+        it(`author doesn't exist`, () => {
+            return request(app).post('/api/articles').send({
+                author: 'not-a-user',
+                title: 'A great title',
+                body: `This is an article.
+                
+                It has multiple lines`,
+                topic: 'cats'
+            })
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe('No such user')
+                })
+        })
+        it(`topic doesn't exist`, () => {
+            return request(app).post('/api/articles').send({
+                author: 'lurker',
+                title: 'A great title',
+                body: `This is an article.
+                
+                It has multiple lines`,
+                topic: 'not-a-topic'
+            })
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe(`Topic doesn't exist`)
+                })
+        })
+        it(`article_img_url not an image URL`, () => {
+            return request(app).post('/api/articles').send({
+                author: 'lurker',
+                title: 'A great title',
+                body: `This is an article.
+                
+                It has multiple lines`,
+                topic: 'cats',
+                article_img_url: 'not-an-image-url'
+            })
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe(`Invalid image URL`)
+                })
+        })
+        it('rejects missing body', () => {
+            return request(app).post('/api/articles').send()
+                .then(result => {
+                    expect(result.status).toBe(400)
+                    expect(result.body.msg).toBe('Invalid request')
+                })
+        })
+    })
 })
 
 describe('/api/articles/:article_id', () => {

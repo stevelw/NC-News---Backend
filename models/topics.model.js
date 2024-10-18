@@ -9,3 +9,10 @@ exports.getTopics = () => {
             return topics
         })
 }
+
+exports.topicExists = (topic) => {
+    return getTopics()
+        .then(topics => {
+            return topics.includes(topic)
+        })
+}

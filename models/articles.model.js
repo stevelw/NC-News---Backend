@@ -1,5 +1,7 @@
 const db = require('../db/connection')
 const format = require('pg-format')
+const { topicExists } = require('./topics.model')
+const { validImageURL } = require('../utils')
 
 exports.getArticleWithId = (articleId) => {
     return db.query(`
@@ -59,5 +61,33 @@ exports.adjustVotesForArticleBy = (articleId, adjustment) => {
         .then((results) => {
             if (!results.rowCount) return Promise.reject({ status: 404, msg: 'Article not found' })
             return results.rows[0]
+        })
+}
+
+exports.create = (article) => {
+    const { author, title, body, topic } = article
+    var { article_img_url } = article
+
+    if (article_img_url && !validImageURL(article_img_url)) return Promise.reject({ status: 400, msg: 'Invalid image URL' })
+    article_img_url = article_img_url ?? 'https://commons.wikimedia.org/wiki/File:Blue_Tiles_-_Free_For_Commercial_Use_-_FFCU_(26777905945).jpg'
+
+    const query = {
+        text: `
+        WITH inserted_article as (
+            INSERT INTO articles
+                (author, title, body, topic, article_img_url)
+            VALUES
+                ($1, $2, $3, $4, $5)
+            RETURNING *
+        ) SELECT inserted_article.author, title, inserted_article.body, topic, article_img_url, inserted_article.article_id, inserted_article.votes, inserted_article.created_at, COUNT(comment_id)::INT AS comment_count
+        FROM inserted_article
+        LEFT JOIN comments ON inserted_article.article_id = comments.article_id
+        GROUP BY inserted_article.article_id, inserted_article.author, title, inserted_article.body, topic, article_img_url, inserted_article.votes, inserted_article.created_at
+        `,
+        values: [author, title, body, topic, article_img_url]
+    }
+    return db.query(query)
+        .then(({ rows }) => {
+            return rows[0]
         })
 }

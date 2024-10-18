@@ -34,3 +34,11 @@ exports.patchArticle = (req, res, next) => {
             next(err)
         })
 }
+
+exports.createArticle = (req, res, next) => {
+    return articlesModel.create(req.body)
+        .then(newArticle => {
+            res.status(201).send({ article: newArticle })
+        })
+        .catch(err => next(err))
+}

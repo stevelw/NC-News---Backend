@@ -3,6 +3,7 @@ const {
   createRef,
   formatComments,
 } = require("../db/seeds/utils");
+const { validImageURL } = require("../utils");
 
 describe("convertTimestampToDate", () => {
   test("returns a new object", () => {
@@ -102,3 +103,22 @@ describe("formatComments", () => {
     expect(formattedComments[0].created_at).toEqual(new Date(timestamp));
   });
 });
+
+describe('validImageURL', () => {
+  it('returns true for a valid image URL', () => {
+    expect(validImageURL('https://commons.wikimedia.org/wiki/File:Blue_Tiles_-_Free_For_Commercial_Use_-_FFCU_(26777905945).jpg')).toBe(true)
+    expect(validImageURL('url.gif')).toBe(true)
+    expect(validImageURL('url.jpeg')).toBe(true)
+    expect(validImageURL('url.png')).toBe(true)
+    expect(validImageURL('url.webp')).toBe(true)
+  })
+  it('returns false if not a string', () => {
+    expect(validImageURL(1)).toBe(false)
+    expect(validImageURL(true)).toBe(false)
+    expect(validImageURL([])).toBe(false)
+  })
+  it('returns false for a URL without an image extension', () => {
+    expect(validImageURL('not-an-image')).toBe(false)
+    expect(validImageURL('not-an-image.exe')).toBe(false)
+  })
+})
