@@ -177,5 +177,15 @@
         }
       ]
     }
+  },
+  "GET /api/users/:username": {
+    "description": "serves the user with :username",
+    "exampleResponse": {
+      "user": {
+        "username": "icellusedkars",
+        "name": "sam",
+        "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+      }
+    }
   }
 }
