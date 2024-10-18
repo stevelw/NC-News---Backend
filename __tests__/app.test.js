@@ -500,6 +500,72 @@ describe('/api/comments/:comment_id', () => {
                 })
             })
     })
+    describe('PATCH - 200 - increases or decrease the vote property by .inc_votes and return the updated comment', () => {
+        it('increases', () => {
+            return request(app).patch('/api/comments/14').send({ inc_votes: 5 })
+                .expect(200)
+                .then(({ body: { updatedComment } }) => {
+                    expect(updatedComment).toMatchObject({
+                        comment_id: 14,
+                        votes: 21,
+                        created_at: expect.any(String),
+                        author: expect.any(String),
+                        body: expect.any(String),
+                        article_id: expect.any(Number)
+                    })
+                })
+        })
+        it('decreases', () => {
+            return request(app).patch('/api/comments/14').send({ inc_votes: -5 })
+                .expect(200)
+                .then(({ body: { updatedComment } }) => {
+                    expect(updatedComment).toMatchObject({
+                        comment_id: 14,
+                        votes: 11,
+                        created_at: expect.any(String),
+                        author: expect.any(String),
+                        body: expect.any(String),
+                        article_id: expect.any(Number)
+                    })
+                })
+        })
+    })
+    it('PATCH - 404 - comment not found', () => {
+        return request(app).patch('/api/comments/' + 999999999).send({ inc_votes: 5 })
+            .expect(404)
+            .then(({ body: { msg } }) => {
+                expect(msg).toBe('Comment not found')
+            })
+    })
+    describe('PATCH 400', () => {
+        it('Comment ID is invalid', () => {
+            return Promise.all(
+                [
+                    request(app).patch('/api/comments/' + 2147483648).send({ inc_votes: 5 }), // Max range for PSQL SERIAL is 1 to 2,147,483,647
+                    request(app).patch('/api/comments/' + 'not-an-int').send({ inc_votes: 5 })
+                ])
+                .then(results => {
+                    results.forEach(result => {
+                        expect(result.status).toBe(400)
+                        expect(result.body.msg).toBe('Invalid input')
+                    })
+                })
+        })
+        it('Body is missing', () => {
+            return request(app).patch('/api/comments/4')
+                .then(result => {
+                    expect(result.status).toBe(400)
+                    expect(result.body.msg).toBe('Invalid request')
+                })
+        })
+        it('.inc_votes is invalid', () => {
+            return request(app).patch('/api/comments/' + 4).send({ inc_votes: "Vote for me!" })
+                .then(result => {
+                    expect(result.status).toBe(400)
+                    expect(result.body.msg).toBe('Invalid input')
+                })
+        })
+    })
 })
 
 describe('/api/users', () => {

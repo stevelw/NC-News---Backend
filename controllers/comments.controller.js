@@ -27,4 +27,12 @@ exports.deleteComment = (req, res, next) => {
         })
         .catch(err => next(err))
 }
+
+exports.patchComment = (req, res, next) => {
+    const { body, params } = req
+    return commentsModel.updateVotesForBy(params.comment_id, body.inc_votes)
+        .then(updatedComment => {
+            res.status(200).send({ updatedComment })
+        })
+        .catch(err => next(err))
 }

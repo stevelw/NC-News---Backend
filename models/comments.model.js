@@ -49,5 +49,21 @@ exports.deleteCommentWithId = (commentId) => {
             if (deletedComments.length === 0) return Promise.reject({ status: 404, msg: 'No such comment' })
         })
 }
+
+exports.updateVotesForBy = (commentId, adjustment) => {
+    const query = {
+        text: `
+            UPDATE comments
+            SET votes = votes + $1
+            WHERE comment_id = $2
+            RETURNING *
+            `,
+        values: [adjustment, commentId]
+    }
+
+    return db.query(query)
+        .then((results) => {
+            if (!results.rowCount) return Promise.reject({ status: 404, msg: 'Comment not found' })
+            return results.rows[0]
         })
 }
