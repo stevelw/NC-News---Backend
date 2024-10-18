@@ -16,7 +16,7 @@ exports.handlePsqlErrors = (err, req, res, next) => {
             if (err.detail.includes('article_id')) {
                 res.status(404).send({ msg: `Article doesn't exist` })
             } else if (err.detail.includes('author')) {
-                res.status(404).send({ msg: 'No such user'})
+                res.status(400).send({ msg: 'No such user' })
             } else {
                 res.status(404).send({ msg: `foreign_key_violation` })
             }

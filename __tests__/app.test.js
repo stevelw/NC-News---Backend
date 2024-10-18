@@ -391,31 +391,29 @@ describe('/api/articles/:article_id/comments', () => {
                 })
         })
     })
-    describe(`POST - 404`, () => {
-        it(`article doesn't exist`, () => {
-            const exampleComment = {
-                invalidArticle_id: 999999999,
-                username: "butter_bridge",
-                body: "What a lovely article!"
-            }
-            return request(app).post('/api/articles/' + exampleComment.invalidArticle_id + '/comments').send(exampleComment)
-                .expect(404)
-                .then(({ body: { msg } }) => {
-                    expect(msg).toBe(`Article doesn't exist`)
-                })
-        })
-        it(`username doesn't exist`, () => {
-            const exampleComment = {
-                article_id: 1,
-                username: "not-a-user",
-                body: "What a lovely article!"
-            }
-            return request(app).post('/api/articles/' + exampleComment.article_id + '/comments').send(exampleComment)
-                .expect(404)
-                .then(({ body: { msg } }) => {
-                    expect(msg).toBe('No such user')
-                })
-        })
+    it(`POST - 404 - article doesn't exist`, () => {
+        const exampleComment = {
+            invalidArticle_id: 999999999,
+            username: "butter_bridge",
+            body: "What a lovely article!"
+        }
+        return request(app).post('/api/articles/' + exampleComment.invalidArticle_id + '/comments').send(exampleComment)
+            .expect(404)
+            .then(({ body: { msg } }) => {
+                expect(msg).toBe(`Article doesn't exist`)
+            })
+    })
+    it(`POST - 400 - username doesn't exist`, () => {
+        const exampleComment = {
+            article_id: 1,
+            username: "not-a-user",
+            body: "What a lovely article!"
+        }
+        return request(app).post('/api/articles/' + exampleComment.article_id + '/comments').send(exampleComment)
+            .expect(400)
+            .then(({ body: { msg } }) => {
+                expect(msg).toBe('No such user')
+            })
     })
     describe(`POST - 400 - invalid inputs`, () => {
         it('rejects invalid article_id', () => {
