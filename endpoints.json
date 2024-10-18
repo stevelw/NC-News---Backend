@@ -73,6 +73,29 @@
       ]
     }
   },
+  "POST /api/articles": {
+    "description": "creates a new article and returns it. article_img_url is optional.",
+    "exampleRequestBody": {
+      "author": "lurker",
+      "title": "A great title",
+      "body": "This is an article.\nIt has multiple lines",
+      "topic": "cats",
+      "article_img_url": "https://commons.wikimedia.org/wiki/File:VN_drip_coffee_on_table.jpg"
+    },
+    "exampleResponse": {
+      "article": {
+        "author": "lurker",
+        "title": "A great title",
+        "body": "This is an article.\n\nIt has multiple lines",
+        "topic": "cats",
+        "article_img_url": "https://commons.wikimedia.org/wiki/File:VN_drip_coffee_on_table.jpg",
+        "article_id": 14,
+        "votes": 0,
+        "created_at": "2024-10-18T16:08:39.898Z",
+        "comment_count": 0
+      }
+    }
+  },
   "GET /api/articles/:article_id": {
     "description": "serves the article with :article_id",
     "exampleResponse": {
