@@ -14,7 +14,7 @@ describe(`Endpoint doesn't exist`, () => {
     it('GET - 404', () => {
         return request(app).get('/api/not-an-endpoint')
             .expect(404)
-            .then(({ body : { msg }}) => {
+            .then(({ body: { msg } }) => {
                 expect(msg).toBe('Invalid endpoint. Check /api for a list of all available endpoints.')
             })
     })
@@ -45,7 +45,7 @@ describe('/api/articles', () => {
         it('Returns an array of articles', () => {
             return request(app).get('/api/articles')
                 .expect(200)
-                .then(({ body: { articles }}) => {
+                .then(({ body: { articles } }) => {
                     expect(articles).toHaveLength(testData.articleData.length)
                     articles.forEach(article => {
                         expect(article).toMatchObject({
@@ -63,7 +63,7 @@ describe('/api/articles', () => {
         it('All articles are returned', () => {
             return request(app).get('/api/articles')
                 .expect(200)
-                .then(({ body: { articles }}) => {
+                .then(({ body: { articles } }) => {
                     expect(articles).toHaveLength(testData.articleData.length)
                 })
         })
@@ -72,10 +72,10 @@ describe('/api/articles', () => {
             const expectedCommentCount = 0
             return request(app).get('/api/articles')
                 .expect(200)
-                .then(({ body: { articles }}) => {
+                .then(({ body: { articles } }) => {
                     expect(articles).toHaveLength(testData.articleData.length)
                     articles.forEach(article => {
-                        if ( article.article_id === exampleArticleId ) expect( article.comment_count ).toBe(expectedCommentCount)
+                        if (article.article_id === exampleArticleId) expect(article.comment_count).toBe(expectedCommentCount)
                         expect(article).toMatchObject({
                             comment_count: expect.any(Number)
                         })
@@ -86,15 +86,15 @@ describe('/api/articles', () => {
             it('date in descending order by default', () => {
                 return request(app).get('/api/articles')
                     .expect(200)
-                    .then(({ body: { articles }}) => {
-                        expect(articles).toBeSortedBy('created_at', { descending: true})
+                    .then(({ body: { articles } }) => {
+                        expect(articles).toBeSortedBy('created_at', { descending: true })
                     })
             })
             it('provided sort_by query', () => {
                 return request(app).get('/api/articles').query({ sort_by: 'votes' })
                     .expect(200)
-                    .then(({ body: { articles }}) => {
-                        expect(articles).toBeSortedBy('votes', { descending: true})
+                    .then(({ body: { articles } }) => {
+                        expect(articles).toBeSortedBy('votes', { descending: true })
                     })
             })
             it('provided order query', () => {
@@ -102,16 +102,16 @@ describe('/api/articles', () => {
                     request(app).get('/api/articles').query({ order: 'desc' }).expect(200),
                     request(app).get('/api/articles').query({ order: 'asc' }).expect(200)
                 ])
-                .then( results => {
-                    expect(results[0].body.articles).toBeSortedBy('created_at', { descending: true})
-                    expect(results[1].body.articles).toBeSortedBy('created_at', { descending: false})
-                })
+                    .then(results => {
+                        expect(results[0].body.articles).toBeSortedBy('created_at', { descending: true })
+                        expect(results[1].body.articles).toBeSortedBy('created_at', { descending: false })
+                    })
             })
         })
         it('does not return a body property for the articles', () => {
             return request(app).get('/api/articles')
                 .expect(200)
-                .then(({ body: { articles }}) => {
+                .then(({ body: { articles } }) => {
                     expect(articles).toHaveLength(testData.articleData.length)
                     articles.forEach(article => {
                         expect(article).not.toHaveProperty('body')
@@ -122,27 +122,27 @@ describe('/api/articles', () => {
             it('uses a provided topic query to filter output', () => {
                 return request(app).get('/api/articles').query({ topic: 'cats' })
                     .expect(200)
-                    .then(({ body: { articles }}) => {
+                    .then(({ body: { articles } }) => {
                         expect(articles).toHaveLength(1)
-                        articles.forEach( ({ topic }) => {
+                        articles.forEach(({ topic }) => {
                             expect(topic).toBe('cats')
                         })
                     })
             })
             it('returns an empty list if the topic exists but no articles match', () => {
                 return request(app).get('/api/articles').query({ topic: 'paper' })
-                .expect(200)
-                .then(({ body: { articles }}) => {
-                    expect(articles).toHaveLength(0)
-                })
+                    .expect(200)
+                    .then(({ body: { articles } }) => {
+                        expect(articles).toHaveLength(0)
+                    })
             })
             it(`returns an empty list if the topic isn't found`, () => {
                 return request(app).get('/api/articles').query({ topic: 'not-a-valid-topic' })
-                .expect(200)
-                .then(({ body: { articles }}) => {
-                    expect(articles).toHaveLength(0)
-                })
-        })
+                    .expect(200)
+                    .then(({ body: { articles } }) => {
+                        expect(articles).toHaveLength(0)
+                    })
+            })
 
         })
     })
@@ -153,11 +153,11 @@ describe('/api/articles', () => {
                     request(app).get('/api/articles').query({ sort_by: 'not-a-valid-column' }).expect(400),
                     request(app).get('/api/articles').query({ sort_by: 5 }).expect(400)
                 ])
-            .then(results => {
-                results.forEach(result => {
-                    expect(result.body.msg).toBe('Invalid input')
+                .then(results => {
+                    results.forEach(result => {
+                        expect(result.body.msg).toBe('Invalid input')
+                    })
                 })
-            })
         })
         it('Rejects invalid order queries', () => {
             return Promise.all(
@@ -165,11 +165,11 @@ describe('/api/articles', () => {
                     request(app).get('/api/articles').query({ order: 'not-a-valid-order' }).expect(400),
                     request(app).get('/api/articles').query({ order: 5 }).expect(400)
                 ])
-            .then(results => {
-                results.forEach(result => {
-                    expect(result.body.msg).toBe('Invalid input')
+                .then(results => {
+                    results.forEach(result => {
+                        expect(result.body.msg).toBe('Invalid input')
+                    })
                 })
-            })
         })
     })
 })
@@ -205,7 +205,7 @@ describe('/api/articles/:article_id', () => {
     it('GET - 404 - ID not found', () => {
         return request(app).get('/api/articles/' + 999999999)
             .expect(404)
-            .then(({ body: { msg }}) => {
+            .then(({ body: { msg } }) => {
                 expect(msg).toBe('Article not found')
             })
     })
@@ -228,46 +228,46 @@ describe('/api/articles/:article_id', () => {
             const increaseBy = 5
             var initialVotesValue
             return request(app).get('/api/articles/' + exampleArticleId)
-            .then(({ body : { article : { votes }}}) => {
-                initialVotesValue = votes
-                const exampleBody = {
-                    inc_votes: increaseBy
-                }
-                return request(app).patch('/api/articles/' + exampleArticleId).send(exampleBody)
-                .expect(200)
-            })
-            .then(({ body : { updatedArticle } }) => {
-                expect(updatedArticle).toMatchObject({
-                    author: expect.any(String),
-                    title: expect.any(String),
-                    article_id: exampleArticleId,
-                    body: expect.any(String),
-                    topic: expect.any(String),
-                    created_at: expect.any(String),
-                    votes: initialVotesValue + increaseBy,
-                    article_img_url: expect.any(String)
+                .then(({ body: { article: { votes } } }) => {
+                    initialVotesValue = votes
+                    const exampleBody = {
+                        inc_votes: increaseBy
+                    }
+                    return request(app).patch('/api/articles/' + exampleArticleId).send(exampleBody)
+                        .expect(200)
                 })
-            })
+                .then(({ body: { updatedArticle } }) => {
+                    expect(updatedArticle).toMatchObject({
+                        author: expect.any(String),
+                        title: expect.any(String),
+                        article_id: exampleArticleId,
+                        body: expect.any(String),
+                        topic: expect.any(String),
+                        created_at: expect.any(String),
+                        votes: initialVotesValue + increaseBy,
+                        article_img_url: expect.any(String)
+                    })
+                })
         })
         it('decreases', () => {
             const exampleArticleId = 4
             const decreaseBy = 5
             var initialVotesValue
             return request(app).get('/api/articles/' + exampleArticleId)
-            .then(({ body : { article : { votes }}}) => {
-                initialVotesValue = votes
-                const exampleBody = {
-                    inc_votes: 0 - decreaseBy
-                }
-                return request(app).patch('/api/articles/' + exampleArticleId).send(exampleBody)
-                .expect(200)
-            })
-            .then(({ body : { updatedArticle } }) => {
-                expect(updatedArticle).toMatchObject({
-                    article_id: exampleArticleId,
-                    votes: initialVotesValue - decreaseBy
+                .then(({ body: { article: { votes } } }) => {
+                    initialVotesValue = votes
+                    const exampleBody = {
+                        inc_votes: 0 - decreaseBy
+                    }
+                    return request(app).patch('/api/articles/' + exampleArticleId).send(exampleBody)
+                        .expect(200)
                 })
-            })
+                .then(({ body: { updatedArticle } }) => {
+                    expect(updatedArticle).toMatchObject({
+                        article_id: exampleArticleId,
+                        votes: initialVotesValue - decreaseBy
+                    })
+                })
         })
     })
     it('PATCH - 404 - article not found', () => {
@@ -276,7 +276,7 @@ describe('/api/articles/:article_id', () => {
         }
         return request(app).patch('/api/articles/' + 999999999).send(exampleBody)
             .expect(404)
-            .then(({ body: { msg }}) => {
+            .then(({ body: { msg } }) => {
                 expect(msg).toBe('Article not found')
             })
     })
@@ -300,10 +300,10 @@ describe('/api/articles/:article_id', () => {
         it('Body is missing', () => {
             const exampleArticleId = 4
             return request(app).patch('/api/articles/' + exampleArticleId)
-            .then(result => {
-                expect(result.status).toBe(400)
-                expect(result.body.msg).toBe('Invalid request')
-            })
+                .then(result => {
+                    expect(result.status).toBe(400)
+                    expect(result.body.msg).toBe('Invalid request')
+                })
         })
         it('.inc_votes is invalid', () => {
             const exampleArticleId = 4
@@ -311,10 +311,10 @@ describe('/api/articles/:article_id', () => {
                 inc_votes: "Vote for me!"
             }
             return request(app).patch('/api/articles/' + exampleArticleId).send(invalidInc_votesExampleBody)
-            .then(result => {
-                expect(result.status).toBe(400)
-                expect(result.body.msg).toBe('Invalid input')
-            })
+                .then(result => {
+                    expect(result.status).toBe(400)
+                    expect(result.body.msg).toBe('Invalid input')
+                })
         })
     })
 })
@@ -326,9 +326,9 @@ describe('/api/articles/:article_id/comments', () => {
             const expectedNumberOfComments = 11
             return request(app).get('/api/articles/' + exampleArticleId + '/comments')
                 .expect(200)
-                .then(({ body: { comments }}) => {
+                .then(({ body: { comments } }) => {
                     expect(comments).toHaveLength(expectedNumberOfComments)
-                    comments.forEach( comment => {
+                    comments.forEach(comment => {
                         expect(comment).toMatchObject({
                             comment_id: expect.any(Number),
                             votes: expect.any(Number),
@@ -343,19 +343,19 @@ describe('/api/articles/:article_id/comments', () => {
         it('sorts comments by descending created_at', () => {
             const exampleArticleId = 1
             const expectedNumberOfComments = 11
-            return request(app).get('/api/articles/'+ exampleArticleId + '/comments')
+            return request(app).get('/api/articles/' + exampleArticleId + '/comments')
                 .expect(200)
-                .then(({ body: { comments }}) => {
+                .then(({ body: { comments } }) => {
                     expect(comments).toBeSortedBy("created_at")
                 })
         })
     })
     it(`GET - 404 - article doesn't exist`, () => {
         return request(app).get('/api/articles/' + 999999999 + '/comments')
-        .expect(404)
-        .then(({ body: { msg }}) => {
-            expect(msg).toBe('Article not found')
-        })
+            .expect(404)
+            .then(({ body: { msg } }) => {
+                expect(msg).toBe('Article not found')
+            })
     })
     it('GET - 400 - ID not a +ve integer in range', () => {
         return Promise.all(
@@ -378,17 +378,17 @@ describe('/api/articles/:article_id/comments', () => {
                 body: "What a lovely article!"
             }
             return request(app).post('/api/articles/' + exampleComment.article_id + '/comments').send(exampleComment)
-            .expect(201)
-            .then(({ body: { comment } }) => {
-                expect(comment).toMatchObject({
-                    comment_id: expect.any(Number),
-                    votes: 0,
-                    created_at: expect.any(String),
-                    author: exampleComment.username,
-                    body: exampleComment.body,
-                    article_id: exampleComment.article_id
+                .expect(201)
+                .then(({ body: { comment } }) => {
+                    expect(comment).toMatchObject({
+                        comment_id: expect.any(Number),
+                        votes: 0,
+                        created_at: expect.any(String),
+                        author: exampleComment.username,
+                        body: exampleComment.body,
+                        article_id: exampleComment.article_id
+                    })
                 })
-            })
         })
     })
     describe(`POST - 404`, () => {
@@ -399,10 +399,10 @@ describe('/api/articles/:article_id/comments', () => {
                 body: "What a lovely article!"
             }
             return request(app).post('/api/articles/' + exampleComment.invalidArticle_id + '/comments').send(exampleComment)
-            .expect(404)
-            .then(({ body: { msg }}) => {
-                expect(msg).toBe(`Article doesn't exist`)
-            })
+                .expect(404)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe(`Article doesn't exist`)
+                })
         })
         it(`username doesn't exist`, () => {
             const exampleComment = {
@@ -411,10 +411,10 @@ describe('/api/articles/:article_id/comments', () => {
                 body: "What a lovely article!"
             }
             return request(app).post('/api/articles/' + exampleComment.article_id + '/comments').send(exampleComment)
-            .expect(404)
-            .then(({ body: { msg }}) => {
-                expect(msg).toBe('No such user')
-            })
+                .expect(404)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe('No such user')
+                })
         })
     })
     describe(`POST - 400 - invalid inputs`, () => {
@@ -441,10 +441,10 @@ describe('/api/articles/:article_id/comments', () => {
                 body: "What a lovely article!"
             }
             return request(app).post('/api/articles/' + exampleArticleId + '/comments').send(missingUsernameExampleComment)
-            .then(result => {
-                expect(result.status).toBe(400)
-                expect(result.body.msg).toBe('Invalid request')
-            })
+                .then(result => {
+                    expect(result.status).toBe(400)
+                    expect(result.body.msg).toBe('Invalid request')
+                })
         })
         it('rejects missing body', () => {
             const exampleArticleId = 4
@@ -452,10 +452,10 @@ describe('/api/articles/:article_id/comments', () => {
                 username: "butter_bridge"
             }
             return request(app).post('/api/articles/' + exampleArticleId + '/comments').send(missingBodyExampleComment)
-            .then(result => {
-                expect(result.status).toBe(400)
-                expect(result.body.msg).toBe('Invalid request')
-            })
+                .then(result => {
+                    expect(result.status).toBe(400)
+                    expect(result.body.msg).toBe('Invalid request')
+                })
         })
     })
 })
@@ -466,24 +466,24 @@ describe('/api/comments/:comment_id', () => {
 
         const exampleCommentId = 1
         const articleIdForComment = 9
-        
+
         return request(app).get('/api/articles/' + articleIdForComment + '/comments')
-        .then(({ body : { comments }}) => {
-            startingNumberOfComments = comments.length
-            return request(app).delete('/api/comments/' + exampleCommentId)
-            .expect(204)
-        })
-        .then(() => {
-            return request(app).get('/api/articles/' + articleIdForComment + '/comments')
-        })
-        .then(({ body : { comments }}) => {
-            expect(comments).toHaveLength(startingNumberOfComments - 1)
-        })
+            .then(({ body: { comments } }) => {
+                startingNumberOfComments = comments.length
+                return request(app).delete('/api/comments/' + exampleCommentId)
+                    .expect(204)
+            })
+            .then(() => {
+                return request(app).get('/api/articles/' + articleIdForComment + '/comments')
+            })
+            .then(({ body: { comments } }) => {
+                expect(comments).toHaveLength(startingNumberOfComments - 1)
+            })
     })
     it('DELETE - 404 - ID not found', () => {
         return request(app).delete('/api/comments/' + 999999999)
             .expect(404)
-            .then(({ body: { msg }}) => {
+            .then(({ body: { msg } }) => {
                 expect(msg).toBe('No such comment')
             })
     })
@@ -500,39 +500,105 @@ describe('/api/comments/:comment_id', () => {
                 })
             })
     })
+    describe('PATCH - 200 - increases or decrease the vote property by .inc_votes and return the updated comment', () => {
+        it('increases', () => {
+            return request(app).patch('/api/comments/14').send({ inc_votes: 5 })
+                .expect(200)
+                .then(({ body: { updatedComment } }) => {
+                    expect(updatedComment).toMatchObject({
+                        comment_id: 14,
+                        votes: 21,
+                        created_at: expect.any(String),
+                        author: expect.any(String),
+                        body: expect.any(String),
+                        article_id: expect.any(Number)
+                    })
+                })
+        })
+        it('decreases', () => {
+            return request(app).patch('/api/comments/14').send({ inc_votes: -5 })
+                .expect(200)
+                .then(({ body: { updatedComment } }) => {
+                    expect(updatedComment).toMatchObject({
+                        comment_id: 14,
+                        votes: 11,
+                        created_at: expect.any(String),
+                        author: expect.any(String),
+                        body: expect.any(String),
+                        article_id: expect.any(Number)
+                    })
+                })
+        })
+    })
+    it('PATCH - 404 - comment not found', () => {
+        return request(app).patch('/api/comments/' + 999999999).send({ inc_votes: 5 })
+            .expect(404)
+            .then(({ body: { msg } }) => {
+                expect(msg).toBe('Comment not found')
+            })
+    })
+    describe('PATCH 400', () => {
+        it('Comment ID is invalid', () => {
+            return Promise.all(
+                [
+                    request(app).patch('/api/comments/' + 2147483648).send({ inc_votes: 5 }), // Max range for PSQL SERIAL is 1 to 2,147,483,647
+                    request(app).patch('/api/comments/' + 'not-an-int').send({ inc_votes: 5 })
+                ])
+                .then(results => {
+                    results.forEach(result => {
+                        expect(result.status).toBe(400)
+                        expect(result.body.msg).toBe('Invalid input')
+                    })
+                })
+        })
+        it('Body is missing', () => {
+            return request(app).patch('/api/comments/4')
+                .then(result => {
+                    expect(result.status).toBe(400)
+                    expect(result.body.msg).toBe('Invalid request')
+                })
+        })
+        it('.inc_votes is invalid', () => {
+            return request(app).patch('/api/comments/' + 4).send({ inc_votes: "Vote for me!" })
+                .then(result => {
+                    expect(result.status).toBe(400)
+                    expect(result.body.msg).toBe('Invalid input')
+                })
+        })
+    })
 })
 
 describe('/api/users', () => {
     it('GET - 200 - serves a list of all users', () => {
         return request(app).get('/api/users')
-        .expect(200)
-        .then(({ body : { users }}) => {
-            expect(users).toHaveLength(testData.userData.length)
-            users.forEach( user => {
-                expect(user).toMatchObject({
-                    username: expect.any(String),
-                    name: expect.any(String),
-                    avatar_url: expect.any(String)
+            .expect(200)
+            .then(({ body: { users } }) => {
+                expect(users).toHaveLength(testData.userData.length)
+                users.forEach(user => {
+                    expect(user).toMatchObject({
+                        username: expect.any(String),
+                        name: expect.any(String),
+                        avatar_url: expect.any(String)
+                    })
                 })
             })
-        })
     })
     describe('/api/users:username', () => {
         it('GET - 200 - Returns the user with username', () => {
-                return request(app).get('/api/users/icellusedkars')
-                    .expect(200)
-                    .then(({ body: { user } }) => {
-                        expect(user).toMatchObject({
-                            username: 'icellusedkars',
-                            avatar_url: 'https://avatars2.githubusercontent.com/u/24604688?s=460&v=4',
-                            name: 'sam'
-                        })
+            return request(app).get('/api/users/icellusedkars')
+                .expect(200)
+                .then(({ body: { user } }) => {
+                    expect(user).toMatchObject({
+                        username: 'icellusedkars',
+                        avatar_url: 'https://avatars2.githubusercontent.com/u/24604688?s=460&v=4',
+                        name: 'sam'
                     })
-            })
+                })
+        })
         it('GET - 404 - username not found', () => {
             return request(app).get('/api/users/notAValidUsername')
                 .expect(404)
-                .then(({ body: { msg }}) => {
+                .then(({ body: { msg } }) => {
                     expect(msg).toBe('User not found')
                 })
         })
