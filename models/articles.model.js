@@ -9,8 +9,8 @@ exports.getArticleWithId = (articleId) => {
         WHERE articles.article_id = $1
         GROUP BY articles.article_id
         `, [articleId])
-        .then(({ rowCount, rows}) => {
-            if (!rowCount) return Promise.reject({ status: 404, msg: 'Article not found'})
+        .then(({ rowCount, rows }) => {
+            if (!rowCount) return Promise.reject({ status: 404, msg: 'Article not found' })
             return rows[0]
         })
 }
@@ -21,7 +21,7 @@ exports.getArticles = (topic, sortBy = 'created_at', order = 'desc') => {
     sortBy = sortBy.toLowerCase()
     order = order.toUpperCase()
     if (!allowedSortBys.includes(sortBy) || !allowedOrders.includes(order)) {
-        return Promise.reject({ status: 400, msg: 'Invalid input'})
+        return Promise.reject({ status: 400, msg: 'Invalid input' })
     }
 
     const queryVals = []
@@ -30,14 +30,14 @@ exports.getArticles = (topic, sortBy = 'created_at', order = 'desc') => {
     FROM articles
     LEFT JOIN comments ON articles.article_id = comments.article_id
     `
-    
-    if ( topic ) {
+
+    if (topic) {
         queryVals.push(topic)
         queryStr += `
         WHERE topic = $${queryVals.length}
         `
     }
-    
+
     queryStr += format(`
         GROUP BY articles.article_id
         ORDER BY %I %s
@@ -49,15 +49,15 @@ exports.getArticles = (topic, sortBy = 'created_at', order = 'desc') => {
         })
 }
 
-exports.adjustVotesForArticleBy = ( articleId, adjustment ) => {
+exports.adjustVotesForArticleBy = (articleId, adjustment) => {
     return db.query(`
         UPDATE articles
         SET votes = votes + $2
         WHERE article_id = $1
         RETURNING author, title, article_id, body, topic, created_at, votes, article_img_url
-        `, [ articleId, adjustment ])
+        `, [articleId, adjustment])
         .then((results) => {
-            if (!results.rowCount) return Promise.reject({ status: 404, msg: 'Article not found'})
+            if (!results.rowCount) return Promise.reject({ status: 404, msg: 'Article not found' })
             return results.rows[0]
         })
 }
