@@ -79,7 +79,7 @@
         "article_img_url":
 "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
         "comment_count": 2
-    }
+      }
     }
   },
   "PATCH /api/articles/:article_id": {
@@ -152,7 +152,7 @@
     "description": "Deletes the comment with the provided comment_id."
   },
   "GET /api/users": {
-  "description": "serves an array of all users",
+    "description": "serves an array of all users",
     "exampleResponse": {
       "users": [
         {
@@ -176,6 +176,16 @@
           "avatar_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
         }
       ]
+    }
+  },
+  "GET /api/users/:username": {
+    "description": "serves the user with :username",
+    "exampleResponse": {
+      "user": {
+        "username": "icellusedkars",
+        "name": "sam",
+        "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+      }
     }
   }
 }
