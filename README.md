@@ -31,6 +31,8 @@ Requires [PostgreSQL](https://www.postgresql.org/download/) _v14.12+_ and [Node.
 
 3. Install the development dependencies
 
+    `cd be-nc-news`
+
     `npm install -d`
 
 4. Setup the database
