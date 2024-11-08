@@ -19,7 +19,7 @@ Requires [PostgreSQL](https://www.postgresql.org/download/) _v14.12+_ and [Node.
 
 1. Clone the repo from [github.com/stevelw/be-nc-news](https://github.com/stevelw/be-nc-news)
 
-    `git clone https://github.com/stevelw/be-nc-news`
+    `git clone https://github.com/stevelw/be-nc-news.git`
 
 2. Setup the environment
 
