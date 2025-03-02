@@ -130,6 +130,9 @@
       }
     }
   },
+  "DELETE /api/articles/:article_id": {
+    "description": "Deletes the article with the provided article_id, and any associated comments."
+  },
   "GET /api/articles/article_id/comments": {
     "description": "serves an array of all comments for an article, sorted by decending creation date",
     "exampleResponse": {
