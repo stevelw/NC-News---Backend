@@ -42,3 +42,12 @@ exports.createArticle = (req, res, next) => {
         })
         .catch(err => next(err))
 }
+
+exports.deleteArticle = (req, res, next) => {
+  return articlesModel
+    .deleteArticleWithId(req.params.article_id)
+    .then(() => {
+      res.status(204).send();
+    })
+    .catch((err) => next(err));
+};
