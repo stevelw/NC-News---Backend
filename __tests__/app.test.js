@@ -412,6 +412,83 @@ describe('/api/articles/:article_id', () => {
                 })
         })
     })
+    describe("DELETE", () => {
+      describe("204", () => {
+        it("deletes an article by article_id", () => {
+          return request(app)
+            .post("/api/articles/")
+            .send({
+              author: "lurker",
+              title: "A great title",
+              body: `This is an article.`,
+              topic: "cats",
+              article_img_url:
+                "https://commons.wikimedia.org/wiki/File:VN_drip_coffee_on_table.jpg",
+            })
+            .then(({ body: { article } }) => {
+              return request(app)
+                .delete(`/api/articles/${article.article_id}`)
+                .expect(204)
+                .then(() => {
+                  return article.article_id;
+                });
+            })
+            .then((article_id) => {
+              return request(app)
+                .get(`/api/articles/${article_id}`)
+                .expect(404);
+            });
+        });
+        it("deletes associated comments", () => {
+          return request(app)
+            .post("/api/articles/")
+            .send({
+              author: "lurker",
+              title: "A great title",
+              body: `This is an article.`,
+              topic: "cats",
+              article_img_url:
+                "https://commons.wikimedia.org/wiki/File:VN_drip_coffee_on_table.jpg",
+            })
+            .then(({ body: { article } }) => {
+              return request(app)
+                .post(`/api/articles/${article.article_id}/comments`)
+                .send({
+                  username: "butter_bridge",
+                  body: "What a lovely article!",
+                });
+            })
+            .then(({ body: { comment } }) => {
+              return request(app)
+                .delete(`/api/articles/${comment.article_id}`)
+                .then(() => {
+                  return request(app)
+                    .get(`/api/articles/${comment.article_id}/comments`)
+                    .expect(404);
+                });
+            });
+        });
+      });
+      it("404 - ID not found", () => {
+        return request(app)
+          .delete("/api/articles/999999999")
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("No such article");
+          });
+      });
+      it("400 - ID not valid", () => {
+        return Promise.all([
+          request(app).delete("/api/articles/2147483648"), // Max range for PSQL SERIAL is 1 to 2,147,483,647
+          request(app).delete("/api/articles/not-an-int"),
+        ]).then((results) => {
+          results.forEach((result) => {
+            expect(result.status).toBe(400);
+            expect(result.body.msg).toBe("Invalid input");
+          });
+        });
+      });
+    });
 })
 
 describe('/api/articles/:article_id/comments', () => {
