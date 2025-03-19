@@ -211,7 +211,9 @@ It has multiple lines`,
             })
                 .expect(201)
                 .then(({ body: { article: { article_img_url } } }) => {
-                    expect(article_img_url).toBe('https://commons.wikimedia.org/wiki/File:Blue_Tiles_-_Free_For_Commercial_Use_-_FFCU_(26777905945).jpg')
+                    expect(article_img_url).toBe(
+                      "https://upload.wikimedia.org/wikipedia/commons/2/21/Blue_Tiles_-_Free_For_Commercial_Use_-_FFCU_%2826777905945%29.jpg"
+                    );
                 })
         })
     })

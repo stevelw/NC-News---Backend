@@ -69,7 +69,9 @@ exports.create = (article) => {
     var { article_img_url } = article
 
     if (article_img_url && !validImageURL(article_img_url)) return Promise.reject({ status: 400, msg: 'Invalid image URL' })
-    article_img_url = article_img_url ?? 'https://commons.wikimedia.org/wiki/File:Blue_Tiles_-_Free_For_Commercial_Use_-_FFCU_(26777905945).jpg'
+    article_img_url =
+      article_img_url ??
+      "https://upload.wikimedia.org/wikipedia/commons/2/21/Blue_Tiles_-_Free_For_Commercial_Use_-_FFCU_%2826777905945%29.jpg";
 
     const query = {
         text: `
