@@ -17,39 +17,54 @@ exports.getArticleWithId = (articleId) => {
         })
 }
 
-exports.getArticles = (topic, sortBy = 'created_at', order = 'desc') => {
-    const allowedSortBys = ['author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'article_img_url', 'comment_count']
-    const allowedOrders = ['ASC', 'DESC']
-    sortBy = sortBy.toLowerCase()
-    order = order.toUpperCase()
-    if (!allowedSortBys.includes(sortBy) || !allowedOrders.includes(order)) {
-        return Promise.reject({ status: 400, msg: 'Invalid input' })
-    }
+exports.getArticles = (topic, sortBy = "created_at", order = "desc", page) => {
+  const allowedSortBys = [
+    "author",
+    "title",
+    "article_id",
+    "topic",
+    "created_at",
+    "votes",
+    "article_img_url",
+    "comment_count",
+  ];
+  const allowedOrders = ["ASC", "DESC"];
+  sortBy = sortBy.toLowerCase();
+  order = order.toUpperCase();
+  if (!allowedSortBys.includes(sortBy) || !allowedOrders.includes(order)) {
+    return Promise.reject({ status: 400, msg: "Invalid input" });
+  }
 
-    const queryVals = []
-    let queryStr = `
+  const queryVals = [];
+  let queryStr = `
     SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, article_img_url, COUNT(comment_id)::INT as comment_count
     FROM articles
     LEFT JOIN comments ON articles.article_id = comments.article_id
-    `
+    `;
 
-    if (topic) {
-        queryVals.push(topic)
-        queryStr += `
+  if (topic) {
+    queryVals.push(topic);
+    queryStr += `
         WHERE topic = $${queryVals.length}
-        `
-    }
+        `;
+  }
 
-    queryStr += format(`
+  queryStr += format(
+    `
         GROUP BY articles.article_id
         ORDER BY %I %s
-        `, sortBy, order)
+        LIMIT 10
+        OFFSET %L
+        `,
+    sortBy,
+    order,
+    page - 1,
+  );
 
-    return db.query(queryStr, queryVals)
-        .then(({ rows: articles }) => {
-            return articles
-        })
-}
+  return db.query(queryStr, queryVals).then(({ rows: articles }) => {
+    return articles;
+  });
+};
 
 exports.adjustVotesForArticleBy = (articleId, adjustment) => {
     return db.query(`

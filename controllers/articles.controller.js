@@ -12,16 +12,24 @@ exports.getArticleWithId = (req, res, next) => {
 }
 
 exports.getArticles = (req, res, next) => {
-    const { topic, sort_by, order } = req.query
+  const { topic, sort_by, order, p: page } = req.query;
 
-    return articlesModel.getArticles(topic, sort_by, order)
-        .then(articles => {
-            res.status(200).send({ articles })
-        })
-        .catch(err => {
-            next(err)
-        })
-}
+  if (!page) {
+    res.status(400).send({
+      msg: "Request must be limited by pagination - provide p query parameter",
+    });
+    return;
+  }
+
+  return articlesModel
+    .getArticles(topic, sort_by, order, page)
+    .then((articles) => {
+      res.status(200).send({ articles });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
 
 exports.patchArticle = (req, res, next) => {
     const { params: { article_id }, body: { inc_votes } } = req

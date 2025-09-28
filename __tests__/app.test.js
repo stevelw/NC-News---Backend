@@ -41,137 +41,193 @@ describe('/api/topics', () => {
 })
 
 describe('/api/articles', () => {
-    describe('GET - 200', () => {
-        it('Returns an array of articles', () => {
-            return request(app).get('/api/articles')
-                .expect(200)
-                .then(({ body: { articles } }) => {
-                    expect(articles).toHaveLength(testData.articleData.length)
-                    articles.forEach(article => {
-                        expect(article).toMatchObject({
-                            author: expect.any(String),
-                            title: expect.any(String),
-                            article_id: expect.any(Number),
-                            topic: expect.any(String),
-                            created_at: expect.any(String),
-                            votes: expect.any(Number),
-                            article_img_url: expect.any(String),
-                        })
-                    })
-                })
-        })
-        it('All articles are returned', () => {
-            return request(app).get('/api/articles')
-                .expect(200)
-                .then(({ body: { articles } }) => {
-                    expect(articles).toHaveLength(testData.articleData.length)
-                })
-        })
-        it('Articles include a comment_count computed property', () => {
-            const exampleArticleId = 2
-            const expectedCommentCount = 0
-            return request(app).get('/api/articles')
-                .expect(200)
-                .then(({ body: { articles } }) => {
-                    expect(articles).toHaveLength(testData.articleData.length)
-                    articles.forEach(article => {
-                        if (article.article_id === exampleArticleId) expect(article.comment_count).toBe(expectedCommentCount)
-                        expect(article).toMatchObject({
-                            comment_count: expect.any(Number)
-                        })
-                    })
-                })
-        })
-        describe('articles sorted by', () => {
-            it('date in descending order by default', () => {
-                return request(app).get('/api/articles')
-                    .expect(200)
-                    .then(({ body: { articles } }) => {
-                        expect(articles).toBeSortedBy('created_at', { descending: true })
-                    })
-            })
-            it('provided sort_by query', () => {
-                return request(app).get('/api/articles').query({ sort_by: 'votes' })
-                    .expect(200)
-                    .then(({ body: { articles } }) => {
-                        expect(articles).toBeSortedBy('votes', { descending: true })
-                    })
-            })
-            it('provided order query', () => {
-                return Promise.all([
-                    request(app).get('/api/articles').query({ order: 'desc' }).expect(200),
-                    request(app).get('/api/articles').query({ order: 'asc' }).expect(200)
-                ])
-                    .then(results => {
-                        expect(results[0].body.articles).toBeSortedBy('created_at', { descending: true })
-                        expect(results[1].body.articles).toBeSortedBy('created_at', { descending: false })
-                    })
-            })
-        })
-        it('does not return a body property for the articles', () => {
-            return request(app).get('/api/articles')
-                .expect(200)
-                .then(({ body: { articles } }) => {
-                    expect(articles).toHaveLength(testData.articleData.length)
-                    articles.forEach(article => {
-                        expect(article).not.toHaveProperty('body')
-                    })
-                })
-        })
-        describe('topic query', () => {
-            it('uses a provided topic query to filter output', () => {
-                return request(app).get('/api/articles').query({ topic: 'cats' })
-                    .expect(200)
-                    .then(({ body: { articles } }) => {
-                        expect(articles).toHaveLength(1)
-                        articles.forEach(({ topic }) => {
-                            expect(topic).toBe('cats')
-                        })
-                    })
-            })
-            it('returns an empty list if the topic exists but no articles match', () => {
-                return request(app).get('/api/articles').query({ topic: 'paper' })
-                    .expect(200)
-                    .then(({ body: { articles } }) => {
-                        expect(articles).toHaveLength(0)
-                    })
-            })
-            it(`returns an empty list if the topic isn't found`, () => {
-                return request(app).get('/api/articles').query({ topic: 'not-a-valid-topic' })
-                    .expect(200)
-                    .then(({ body: { articles } }) => {
-                        expect(articles).toHaveLength(0)
-                    })
-            })
-
-        })
-    })
-    describe('GET - 400', () => {
-        it('Rejects invalid sort_by queries', () => {
-            return Promise.all(
-                [
-                    request(app).get('/api/articles').query({ sort_by: 'not-a-valid-column' }).expect(400),
-                    request(app).get('/api/articles').query({ sort_by: 5 }).expect(400)
-                ])
-                .then(results => {
-                    results.forEach(result => {
-                        expect(result.body.msg).toBe('Invalid input')
-                    })
-                })
-        })
-        it('Rejects invalid order queries', () => {
-            return Promise.all(
-                [
-                    request(app).get('/api/articles').query({ order: 'not-a-valid-order' }).expect(400),
-                    request(app).get('/api/articles').query({ order: 5 }).expect(400)
-                ])
-                .then(results => {
-                    results.forEach(result => {
-                        expect(result.body.msg).toBe('Invalid input')
-                    })
-                })
-        })
-    })
+    describe("GET - 200", () => {
+      it("Returns an array of articles", () => {
+        return request(app)
+          .get("/api/articles")
+          .query({ p: 1 })
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).toHaveLength(
+              Math.min(10, testData.articleData.length),
+            );
+            articles.forEach((article) => {
+              expect(article).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+              });
+            });
+          });
+      });
+      it("All articles are returned (limited to pagination)", () => {
+        return request(app)
+          .get("/api/articles")
+          .query({ p: 1 })
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).toHaveLength(
+              Math.min(10, testData.articleData.length),
+            );
+          });
+      });
+      it("Articles include a comment_count computed property", () => {
+        const exampleArticleId = 2;
+        const expectedCommentCount = 0;
+        return request(app)
+          .get("/api/articles")
+          .query({ p: 1 })
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).toHaveLength(
+              Math.min(10, testData.articleData.length),
+            );
+            articles.forEach((article) => {
+              if (article.article_id === exampleArticleId)
+                expect(article.comment_count).toBe(expectedCommentCount);
+              expect(article).toMatchObject({
+                comment_count: expect.any(Number),
+              });
+            });
+          });
+      });
+      describe("articles sorted by", () => {
+        it("date in descending order by default", () => {
+          return request(app)
+            .get("/api/articles")
+            .query({ p: 1 })
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles).toBeSortedBy("created_at", {
+                descending: true,
+              });
+            });
+        });
+        it("provided sort_by query", () => {
+          return request(app)
+            .get("/api/articles")
+            .query({ sort_by: "votes", p: 1 })
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles).toBeSortedBy("votes", { descending: true });
+            });
+        });
+        it("provided order query", () => {
+          return Promise.all([
+            request(app)
+              .get("/api/articles")
+              .query({ order: "desc", p: 1 })
+              .expect(200),
+            request(app)
+              .get("/api/articles")
+              .query({ order: "asc", p: 1 })
+              .expect(200),
+          ]).then((results) => {
+            expect(results[0].body.articles).toBeSortedBy("created_at", {
+              descending: true,
+            });
+            expect(results[1].body.articles).toBeSortedBy("created_at", {
+              descending: false,
+            });
+          });
+        });
+      });
+      it("does not return a body property for the articles", () => {
+        return request(app)
+          .get("/api/articles")
+          .query({ p: 1 })
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).toHaveLength(
+              Math.min(10, testData.articleData.length),
+            );
+            articles.forEach((article) => {
+              expect(article).not.toHaveProperty("body");
+            });
+          });
+      });
+      describe("topic query", () => {
+        it("uses a provided topic query to filter output", () => {
+          return request(app)
+            .get("/api/articles")
+            .query({ topic: "cats", p: 1 })
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles).toHaveLength(1);
+              articles.forEach(({ topic }) => {
+                expect(topic).toBe("cats");
+              });
+            });
+        });
+        it("returns an empty list if the topic exists but no articles match", () => {
+          return request(app)
+            .get("/api/articles")
+            .query({ topic: "paper", p: 1 })
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles).toHaveLength(0);
+            });
+        });
+        it(`returns an empty list if the topic isn't found`, () => {
+          return request(app)
+            .get("/api/articles")
+            .query({ topic: "not-a-valid-topic", p: 1 })
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles).toHaveLength(0);
+            });
+        });
+      });
+      describe("pagination", () => {
+        it("accepts a page query parameter (p, limit defaults to 10)", () => {
+          return request(app)
+            .get("/api/articles")
+            .query({ p: 1 })
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles).toHaveLength(10);
+            });
+        });
+      });
+    });
+    describe("GET - 400", () => {
+      it("Rejects invalid sort_by queries", () => {
+        return Promise.all([
+          request(app)
+            .get("/api/articles")
+            .query({ sort_by: "not-a-valid-column", p: 1 })
+            .expect(400),
+          request(app)
+            .get("/api/articles")
+            .query({ sort_by: 5, p: 1 })
+            .expect(400),
+        ]).then((results) => {
+          results.forEach((result) => {
+            expect(result.body.msg).toBe("Invalid input");
+          });
+        });
+      });
+      it("Rejects invalid order queries", () => {
+        return Promise.all([
+          request(app)
+            .get("/api/articles")
+            .query({ order: "not-a-valid-order", p: 1 })
+            .expect(400),
+          request(app)
+            .get("/api/articles")
+            .query({ order: 5, p: 1 })
+            .expect(400),
+        ]).then((results) => {
+          results.forEach((result) => {
+            expect(result.body.msg).toBe("Invalid input");
+          });
+        });
+      });
+    });
     describe('POST - 201', () => {
         it('adds an artricle and returns it', () => {
             return request(app).post('/api/articles/').send({
