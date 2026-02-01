@@ -34,7 +34,7 @@
     "express": "^5.2.1",
     "pg": "^8.16.3",
     "pg-format": "^1.0.4",
-    "supertest": "^7.1.4"
+    "supertest": "^7.2.2"
   },
   "jest": {
     "setupFilesAfterEnv": [
